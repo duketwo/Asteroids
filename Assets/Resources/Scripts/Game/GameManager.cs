@@ -50,6 +50,7 @@ namespace Assets.Resources.Scripts.Game
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
+            FindObjectsOfType<DynamicLabel>().ToList().ForEach(k => Destroy(k.gameObject));
 
             RespawnPlayer();
             AddStatusBar();
