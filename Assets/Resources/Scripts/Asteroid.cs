@@ -41,6 +41,38 @@ namespace Assets.Resources.Scripts
             col.isTrigger = true;
             rb = this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
+
+            // calculate a random spawn position on one of the borders
+            var rnd = Random.Range(0, 3);
+            Vector3 cornerA = Vector3.zero;
+            Vector3 cornerB = Vector3.zero;
+
+            switch (rnd)
+            {
+                case 0:
+                    cornerA = Utility.topLeftCorner;
+                    cornerB = Utility.botLeftCorner;
+                    break;
+                case 1:
+                    cornerA = Utility.topLeftCorner;
+                    cornerB = Utility.botRightCorner;
+                    break;
+                case 2:
+                    cornerA = Utility.topRightCorner;
+                    cornerB = Utility.botRightCorner;
+                    break;
+                case 3:
+                    cornerA = Utility.botLeftCorner;
+                    cornerB = Utility.botRightCorner;
+                    break;
+            }
+
+            var xMin = cornerA.x < cornerB.x ? cornerA.x : cornerB.x;
+            var xMax = cornerA.x > cornerB.x ? cornerA.x : cornerB.x;
+            var yMin = cornerA.y < cornerB.y ? cornerA.y : cornerB.y;
+            var yMax = cornerA.y > cornerB.y ? cornerA.y : cornerB.y;
+
+            this.transform.position = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), cornerB.z);
         }
 
         public void Update()

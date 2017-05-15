@@ -19,7 +19,7 @@ namespace Assets.Resources.Scripts
         public float distanceZ = 10.0f;
 
 
-        private SpriteRenderer sp;
+        private SpriteRenderer sr;
         private double degree;
         private Vector2 velocityVector2;
         private Material mat;
@@ -29,6 +29,8 @@ namespace Assets.Resources.Scripts
         private Quaternion initialRotation;
         private GameObject bulletSpawnSpot;
         private DateTime lastShot;
+        private PolygonCollider2D col;
+        private Rigidbody2D rb;
 
 
         void Awake()
@@ -42,15 +44,19 @@ namespace Assets.Resources.Scripts
         void Start()
         {
             degree = 0;
-            sp = this.gameObject.AddComponent<SpriteRenderer>();
-            sp.sortingLayerName = "Foreground";
-            sp.sprite = UnityEngine.Resources.Load<Sprite>("Images/spaceship_triangle");
+            sr = this.gameObject.AddComponent<SpriteRenderer>();
+            sr.sortingLayerName = "Foreground";
+            sr.sprite = UnityEngine.Resources.Load<Sprite>("Images/spaceship_triangle");
             velocityVector2 = new Vector2(0, 0);
             initialRotation = this.transform.localRotation;
             bulletSpawnSpot = new GameObject();
             bulletSpawnSpot.transform.position = this.transform.position + new Vector3(0, 1.0f);
             bulletSpawnSpot.transform.SetParent(this.transform);
             lastShot = DateTime.MinValue;
+            col = this.gameObject.AddComponent<PolygonCollider2D>();
+            col.isTrigger = true;
+            rb = this.gameObject.AddComponent<Rigidbody2D>();
+            rb.isKinematic = true;
 
         }
 

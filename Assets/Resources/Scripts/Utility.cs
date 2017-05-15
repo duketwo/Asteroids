@@ -9,11 +9,16 @@ namespace Assets.Resources.Scripts
     public static class Utility
     {
         private static float buffer = 1.0f;
-        private static float distanceZ = 10.0f;
-        public static float leftConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, distanceZ)).x;
-        public static float rightConstraint = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0.0f, distanceZ)).x;
-        public static float topConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, distanceZ)).y;
-        public static float bottomConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, Screen.height, distanceZ)).y;
+        private static float cameraDistZ = 10.0f;
+        public static float leftConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, cameraDistZ)).x;
+        public static float rightConstraint = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0.0f, cameraDistZ)).x;
+        public static float topConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, cameraDistZ)).y;
+        public static float bottomConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, Screen.height, cameraDistZ)).y;
+
+        public static Vector3 topLeftCorner = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, cameraDistZ));
+        public static Vector3 topRightCorner = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0.0f, cameraDistZ));
+        public static Vector3 botLeftCorner = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, Screen.height, cameraDistZ));
+        public static Vector3 botRightCorner = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, cameraDistZ));
 
         public static void ScreenWrap(Transform transform)
         {
