@@ -9,7 +9,10 @@ public sealed class GameManager : MonoBehaviour
     void Start()
     {
         _player = new GameObject().AddComponent<Player>();
-        AddAsteroid(null);
+
+        for (int i = 0; i < 10; i++)
+            AddAsteroid(null);
+
     }
 
     private GameManager()
@@ -35,7 +38,7 @@ public sealed class GameManager : MonoBehaviour
     public void AddAsteroid(AsteroidType? type)
     {
         var asteroid = new GameObject().AddComponent<Asteroid>();
-        asteroid.Init(type);
+        asteroid.Init(type, null);
     }
 
     void Update()

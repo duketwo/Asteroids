@@ -59,7 +59,7 @@ namespace Assets.Resources.Scripts
             rb = this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
             this.tag = TAG;
-            this.name = TAG;
+            this.name = this.GetType().Name;
 
         }
 
