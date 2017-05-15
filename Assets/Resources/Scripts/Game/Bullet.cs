@@ -47,6 +47,8 @@ namespace Assets.Resources.Scripts.Game
             Debug.Log("Bullet colllided with an asteroid.");
             collidedAlready = true;
 
+            GameManager.Instance().StatusBar().Points += GameManager.POINTS_ASTEROID;
+
             var asteroid = c.gameObject.GetComponent<Asteroid>();
             var direction = asteroid.direction;
             var direcIndex = asteroid.DIRECTIONS.IndexOf(direction);

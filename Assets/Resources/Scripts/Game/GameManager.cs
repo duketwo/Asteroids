@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Assets.Resources.Scripts.Game.Menu;
 using Assets.Resources.Scripts.Util;
+using UnityEditor;
 using UnityEngine;
 
 namespace Assets.Resources.Scripts.Game
@@ -12,7 +13,7 @@ namespace Assets.Resources.Scripts.Game
         public bool IsGameOver;
         private Player _player;
         private StatusBar _statusBar;
-
+        public static int POINTS_ASTEROID = 10;
         void Start()
         {
             StartGame();
