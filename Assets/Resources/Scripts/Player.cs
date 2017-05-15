@@ -31,6 +31,7 @@ namespace Assets.Resources.Scripts
         private DateTime lastShot;
         private PolygonCollider2D col;
         private Rigidbody2D rb;
+        public static string TAG = "PLAYER";
 
 
         void Awake()
@@ -57,8 +58,8 @@ namespace Assets.Resources.Scripts
             col.isTrigger = true;
             rb = this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
-            this.tag = this.GetType().Name;
-            this.name = this.tag;
+            this.tag = TAG;
+            this.name = TAG;
 
         }
 
@@ -126,6 +127,15 @@ namespace Assets.Resources.Scripts
         {
             var bullet = new GameObject().AddComponent<Bullet>();
             bullet.Init(bulletSpawnSpot.transform.position - this.transform.position, bulletSpawnSpot.transform.position, bulletSpawnSpot.transform.rotation);
+        }
+
+        private void OnTriggerEnter2D(Collider2D c)
+        {
+            if (c.tag == Asteroid.TAG)
+            {
+                Debug.Log("Player colllided with asteroid.");
+            }
+
         }
 
         void Update()

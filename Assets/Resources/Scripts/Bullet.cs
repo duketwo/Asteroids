@@ -15,6 +15,7 @@ namespace Assets.Resources.Scripts
         private Vector3 direction;
         private float SPEED_CONSTANT = 9.0f;
         private DateTime timeDestroy;
+        public static string TAG = "BULLET";
 
 
         void Start()
@@ -32,8 +33,8 @@ namespace Assets.Resources.Scripts
             col.isTrigger = true;
             rb = this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
-            this.tag = this.GetType().Name;
-            this.name = this.tag;
+            this.tag = TAG;
+            this.name = TAG;
             this.direction = direction;
             this.transform.position = pos;
             this.transform.rotation = rotation;
@@ -41,7 +42,12 @@ namespace Assets.Resources.Scripts
 
         private void OnTriggerEnter2D(Collider2D c)
         {
-            Debug.Log("Collision");
+
+            if (c.tag == Asteroid.TAG)
+            {
+                Debug.Log("Bullet colllided with asteroid.");
+            }
+            
         }
 
         void Update()

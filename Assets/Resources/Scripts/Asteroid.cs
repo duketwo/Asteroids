@@ -15,6 +15,7 @@ namespace Assets.Resources.Scripts
         private SpriteRenderer sr;
         private Vector2 direction;
         private float SPEED_CONSTANT = 9.0f;
+        public static string TAG = "ASTEROID";
         private List<Vector2> DIRECTIONS = new List<Vector2>()
         {
             new Vector2(1,0),
@@ -53,8 +54,8 @@ namespace Assets.Resources.Scripts
             }
 
 
-            this.tag = type.ToString();
-            this.name = type.ToString();
+            this.tag = TAG;
+            this.name = TAG;
             // calculate a random spawn position on one of the borders
             var rnd = Random.Range(0, 3);
             Vector3 cornerA = Vector3.zero;
