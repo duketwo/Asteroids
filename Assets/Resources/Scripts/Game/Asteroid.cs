@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Assets.Resources.Scripts.Util;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -15,6 +16,14 @@ namespace Assets.Resources.Scripts.Game
         public Vector2 direction;
         private float SPEED_CONSTANT = 4.0f;
         public static string TAG = "ASTEROID";
+
+        private static Dictionary<AsteroidType, int> asteroidEntropyDictionary = new Dictionary<AsteroidType, int>()
+        {
+            {AsteroidType.AsteroidL, 0},
+            {AsteroidType.AsteroidM, 0},
+            {AsteroidType.AsteroidS, 0}
+        };
+
         public List<Vector2> DIRECTIONS = new List<Vector2>()
         {
             new Vector2(0,1),
@@ -29,6 +38,26 @@ namespace Assets.Resources.Scripts.Game
 
         public void Start()
         {
+        }
+
+
+        private static AsteroidType GetSemiRandomAsteroidType()
+        {
+            if (asteroidEntropyDictionary.Values.All(k => k >= 10))
+            {
+                asteroidEntropyDictionary[AsteroidType.AsteroidL] = 0;
+                asteroidEntropyDictionary[AsteroidType.AsteroidM] = 0;
+                asteroidEntropyDictionary[AsteroidType.AsteroidS] = 0;
+            }
+
+            foreach (var kv in asteroidEntropyDictionary)
+            {
+                Debug.Log(kv.Key + " " + kv.Value);
+            }
+            var l = asteroidEntropyDictionary.Where(k => k.Value < 10);
+            var rnd = l.ElementAt(Random.Range(0, l.Count()));
+            asteroidEntropyDictionary[rnd.Key]++;
+            return rnd.Key;
         }
 
         public Asteroid Init(AsteroidType? type, Vector2? direction, Vector3? position = null)
@@ -53,8 +82,9 @@ namespace Assets.Resources.Scripts.Game
 
             if (type == null) // pick random type if type is null
             {
-                Array values = Enum.GetValues(typeof(AsteroidType));
-                this.type = (AsteroidType)values.GetValue(Random.Range(0, values.Length));
+                //Array values = Enum.GetValues(typeof(AsteroidType));
+                //this.type = (AsteroidType)values.GetValue(Random.Range(0, values.Length));
+                this.type = GetSemiRandomAsteroidType();
             }
             else
             {
