@@ -10,7 +10,6 @@ namespace Assets.Resources.Scripts.Game
 
 
         public bool IsGameOver;
-        private int playerLives;
         private Player _player;
         private StatusBar _statusBar;
 
@@ -45,7 +44,6 @@ namespace Assets.Resources.Scripts.Game
 
         public void StartGame()
         {
-            playerLives = 3;
             FindObjectsOfType<Player>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
@@ -55,6 +53,8 @@ namespace Assets.Resources.Scripts.Game
             RespawnPlayer();
             AddStatusBar();
 
+            StatusBar().Lives = 3;
+
             for (int i = 0; i < 10; i++)
                 AddAsteroid(null);
         }
@@ -62,11 +62,13 @@ namespace Assets.Resources.Scripts.Game
 
         public void PlayerCollided()
         {
-            playerLives--;
 
-            Debug.Log("Remaining player lives: " + playerLives);
+            if (StatusBar().Lives > 0)
+                StatusBar().Lives--;
 
-            if (playerLives == 0)
+            Debug.Log("Remaining player lives: " + StatusBar().Lives);
+
+            if (StatusBar().Lives == 0)
             {
                 SetGameOver();
             }
