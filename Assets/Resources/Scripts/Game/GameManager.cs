@@ -109,6 +109,9 @@ namespace Assets.Resources.Scripts.Game
 
         public void SetGameOver()
         {
+            if (IsGameOver)
+                return;
+
             DynamicLabel.CreateLabel(string.Format("{0}", "        GAME OVER :( \n PRESS R TO CONTINUE"), DymicLabelPosition.HORIZONTAL_AND_VERTICAL_CENTERED,
                 5.0f, 30, true);
             IsGameOver = true;
@@ -118,14 +121,23 @@ namespace Assets.Resources.Scripts.Game
         {
             if (IsGameOver && Input.GetKeyDown(KeyCode.R))
             {
-                StartGame();
                 IsGameOver = false;
+                StartGame();
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                StatusBar().Lives = 0;
+                SetGameOver();
                 return;
             }
 
             if (Input.GetKeyDown(KeyCode.T))
             {
                 StartGame();
+                IsGameOver = false;
+                return;
             }
         }
     }
