@@ -2,35 +2,35 @@
 using System.Linq;
 using Assets.Resources.Scripts.Game.Menu;
 using Assets.Resources.Scripts.Util;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
+using Utility = Assets.Resources.Scripts.Util.Utility;
 
 namespace Assets.Resources.Scripts.Game
 {
-    public sealed class GameManager : MonoBehaviour
+    public sealed class GameManager : NetworkBehaviour
     {
 
 
         public bool IsGameOver;
-        private Player _player;
         private StatusBar _statusBar;
         public static int POINTS_ASTEROID = 10;
         private int asteroidSpawnDelay = 3000;
         private DateTime nextAsteroidSpawn;
+        private GameObject networkManagerGameObject;
+        public MyNetworkManager networkManager;
+        private NetworkManagerHUD networkManagerHud;
+        private static volatile GameManager instance;
+
         void Start()
         {
+            networkManagerGameObject = new GameObject();
+            networkManager = networkManagerGameObject.AddComponent<MyNetworkManager>();
+            networkManagerHud = networkManagerGameObject.AddComponent<NetworkManagerHUD>();
+            networkManagerHud.manager = networkManager;
+            networkManager.autoCreatePlayer = true;
+            networkManagerHud.showGUI = true;
             StartGame();
-        }
-
-        private GameManager()
-        {
-
-        }
-
-        public Player AddPlayer()
-        {
-            _player = new GameObject().AddComponent<Player>();
-            return _player;
         }
 
         public StatusBar AddStatusBar()
@@ -54,7 +54,7 @@ namespace Assets.Resources.Scripts.Game
             FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<DynamicLabel>().ToList().ForEach(k => Destroy(k.gameObject));
 
-            RespawnPlayer();
+            //Player.CmdRespawnPlayer();
             AddStatusBar();
 
             StatusBar().Lives = 3;
@@ -64,44 +64,11 @@ namespace Assets.Resources.Scripts.Game
         }
 
 
-        public void PlayerCollided()
-        {
-
-            if (StatusBar().Lives > 0)
-                StatusBar().Lives--;
-
-            Debug.Log("Remaining player lives: " + StatusBar().Lives);
-
-            if (StatusBar().Lives == 0)
-            {
-                SetGameOver();
-            }
-            else
-            {
-                RespawnPlayer();
-            }
-        }
-
-        private void RespawnPlayer()
-        {
-            if (_player != null)
-                Destroy(_player.gameObject);
-            AddPlayer().SetInvuln().gameObject.transform.position = Utility.center;
-        }
-
-        private static volatile GameManager instance;
-
         public static GameManager Instance()
         {
             if (instance == null)
                 instance = FindObjectOfType<GameManager>();
             return instance;
-        }
-
-
-        public Player Player()
-        {
-            return _player;
         }
 
         public void AddAsteroid(AsteroidType? type)

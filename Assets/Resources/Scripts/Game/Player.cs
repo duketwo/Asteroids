@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Resources.Scripts.Util;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.Networking.Types;
+
 
 namespace Assets.Resources.Scripts.Game
 {
-    public class Player : MonoBehaviour
+    public class Player : NetworkBehaviour
     {
-
-        public float bottomConstraint = 0.0f;
-        public float topConstraint = 0.0f;
-        public float leftConstraint = 0.0f;
-        public float rightConstraint = 0.0f;
-        public float buffer = 1.0f;
-        public float distanceZ = 10.0f;
         public static string TAG = "PLAYER";
-
         private SpriteRenderer sr;
         private double degree;
         private Vector2 velocityVector2;
@@ -29,15 +24,9 @@ namespace Assets.Resources.Scripts.Game
         private PolygonCollider2D col;
         private Rigidbody2D rb;
         private DateTime invulnUntil;
+        private NetworkIdentity networkIdentity;
+        private bool dead;
 
-
-        void Awake()
-        {
-            leftConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, distanceZ)).x;
-            rightConstraint = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0.0f, distanceZ)).x;
-            topConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, distanceZ)).y;
-            bottomConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, Screen.height, distanceZ)).y;
-        }
 
         void Start()
         {
@@ -58,6 +47,9 @@ namespace Assets.Resources.Scripts.Game
             this.tag = TAG;
             this.name = this.GetType().Name;
             SetInvuln();
+            if (this.GetComponent<NetworkIdentity>() == null)
+                networkIdentity = this.gameObject.AddComponent<NetworkIdentity>();
+            this.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
 
         }
 
@@ -85,8 +77,6 @@ namespace Assets.Resources.Scripts.Game
             this.transform.rotation = initialRotation;
             transform.Rotate(0, 0, Convert.ToSingle(-degree));
         }
-
-
 
         public void ModAcceleration(float val)
         {
@@ -130,14 +120,55 @@ namespace Assets.Resources.Scripts.Game
 
         private void OnTriggerEnter2D(Collider2D c)
         {
-            if (c.tag != Asteroid.TAG)
+            if (c.tag != Asteroid.TAG || dead)
                 return;
             Debug.Log("Player colllided with asteroid.");
-            GameManager.Instance().PlayerCollided();
+
+            dead = true;
+
+            if (GameManager.Instance().StatusBar().Lives > 0)
+                GameManager.Instance().StatusBar().Lives--;
+
+            Debug.Log("Remaining player lives: " + GameManager.Instance().StatusBar().Lives);
+
+            if (GameManager.Instance().StatusBar().Lives == 0)
+            {
+                GameManager.Instance().SetGameOver();
+            }
+            else
+            {
+                CmdRespawnPlayer();
+            }
+
         }
+
+        //        public static void CmdRespawnPlayer()
+        //        {
+        //            FindObjectsOfType<Player>().ToList().ForEach(k => Destroy(k.gameObject));
+        //
+        //            var _player = new GameObject().AddComponent<Player>();
+        //            _player.SetInvuln().gameObject.transform.position = Util.Utility.center;
+        //        }
+
+        [Command]
+        public void CmdRespawnPlayer()
+        {
+            MyNetworkManager myNetworkManager = GameManager.Instance().networkManager;
+            var obj = new GameObject();
+            var _player = obj.AddComponent<Player>();
+            _player.SetInvuln().gameObject.transform.position = Util.Utility.center;
+            NetworkServer.Destroy(this.gameObject);
+            NetworkServer.ReplacePlayerForConnection(myNetworkManager.conn, obj, myNetworkManager.playerControllerId);
+        }
+
 
         void Update()
         {
+            if (!isLocalPlayer)
+            {
+                Debug.Log("Is not local player!");
+                return;
+            }
 
             if (GameManager.Instance().IsGameOver)
                 return;
@@ -163,7 +194,7 @@ namespace Assets.Resources.Scripts.Game
             }
 
             ModAcceleration(v);
-            Utility.ScreenWrap(this.transform);
+            Util.Utility.ScreenWrap(this.transform);
             SetDegree(h);
         }
 
@@ -173,3 +204,14 @@ namespace Assets.Resources.Scripts.Game
         }
     }
 }
+
+
+//[Command]
+//void CmdRespawnSvr()
+//{
+//var spawn = NetworkManager.singleton.GetStartPosition();
+//var newPlayer = (GameObject)Instantiate(NetworkManager.singleton.playerPrefab, spawn.position, spawn.rotation);
+//NetworkServer.Destroy(this.gameObject);
+//NetworkServer.ReplacePlayerForConnection(this.connectionToClient, newPlayer, this.playerControllerId);
+//
+//}
