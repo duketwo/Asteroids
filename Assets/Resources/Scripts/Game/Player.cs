@@ -142,23 +142,11 @@ namespace Assets.Resources.Scripts.Game
 
         }
 
-        //        public static void CmdRespawnPlayer()
-        //        {
-        //            FindObjectsOfType<Player>().ToList().ForEach(k => Destroy(k.gameObject));
-        //
-        //            var _player = new GameObject().AddComponent<Player>();
-        //            _player.SetInvuln().gameObject.transform.position = Util.Utility.center;
-        //        }
-
         [Command]
         public void CmdRespawnPlayer()
         {
             MyNetworkManager myNetworkManager = GameManager.Instance().networkManager;
-            var obj = new GameObject();
-            var _player = obj.AddComponent<Player>();
-            _player.SetInvuln().gameObject.transform.position = Util.Utility.center;
-            NetworkServer.Destroy(this.gameObject);
-            NetworkServer.ReplacePlayerForConnection(myNetworkManager.conn, obj, myNetworkManager.playerControllerId);
+            myNetworkManager.PlayerWasKilled();
         }
 
 

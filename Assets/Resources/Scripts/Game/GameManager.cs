@@ -21,6 +21,7 @@ namespace Assets.Resources.Scripts.Game
         public MyNetworkManager networkManager;
         private NetworkManagerHUD networkManagerHud;
         private static volatile GameManager instance;
+        private bool isGameStarted;
 
         void Start()
         {
@@ -30,7 +31,8 @@ namespace Assets.Resources.Scripts.Game
             networkManagerHud.manager = networkManager;
             networkManager.autoCreatePlayer = true;
             networkManagerHud.showGUI = true;
-            StartGame();
+            AddStatusBar();
+
         }
 
         public StatusBar AddStatusBar()
@@ -48,19 +50,17 @@ namespace Assets.Resources.Scripts.Game
 
         public void StartGame()
         {
-            FindObjectsOfType<Player>().ToList().ForEach(k => Destroy(k.gameObject));
-            FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
-            FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
-            FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
-            FindObjectsOfType<DynamicLabel>().ToList().ForEach(k => Destroy(k.gameObject));
-
-            //Player.CmdRespawnPlayer();
-            AddStatusBar();
-
             StatusBar().Lives = 3;
 
+            if (networkManager.localPlayer != null)
+                networkManager.PlayerWasKilled();
+
+            FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
+            FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
+            FindObjectsOfType<DynamicLabel>().ToList().ForEach(k => Destroy(k.gameObject));
             for (int i = 0; i < 10; i++)
                 AddAsteroid(null);
+            isGameStarted = true;
         }
 
 
@@ -89,6 +89,8 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
+            if (!isGameStarted)
+                return;
 
             if (!IsGameOver && nextAsteroidSpawn < DateTime.Now)
             {
