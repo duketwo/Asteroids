@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Assets.Resources.Scripts.Game.Menu;
 using Assets.Resources.Scripts.Util;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ namespace Assets.Resources.Scripts.Game
 
         public bool IsGameOver;
         private int playerLives;
+        private Player _player;
+        private StatusBar _statusBar;
 
         void Start()
         {
@@ -27,16 +30,30 @@ namespace Assets.Resources.Scripts.Game
             return _player;
         }
 
+        public StatusBar AddStatusBar()
+        {
+            _statusBar = new GameObject().AddComponent<StatusBar>();
+            _statusBar.Init();
+            return _statusBar;
+        }
+
+        public StatusBar StatusBar()
+        {
+            return _statusBar;
+        }
+
 
         public void StartGame()
         {
-
             playerLives = 3;
             FindObjectsOfType<Player>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
+            FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
 
             RespawnPlayer();
+            AddStatusBar();
+
             for (int i = 0; i < 10; i++)
                 AddAsteroid(null);
         }
@@ -74,7 +91,7 @@ namespace Assets.Resources.Scripts.Game
             return instance;
         }
 
-        private Player _player;
+
         public Player Player()
         {
             return _player;
