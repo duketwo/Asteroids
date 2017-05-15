@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Assets.Resources.Scripts.Game.Menu;
 using Assets.Resources.Scripts.Util;
 using UnityEditor;
@@ -14,6 +15,8 @@ namespace Assets.Resources.Scripts.Game
         private Player _player;
         private StatusBar _statusBar;
         public static int POINTS_ASTEROID = 10;
+        private int asteroidSpawnDelay = 3000;
+        private DateTime nextAsteroidSpawn;
         void Start()
         {
             StartGame();
@@ -119,6 +122,15 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
+
+            if (!IsGameOver && nextAsteroidSpawn < DateTime.Now)
+            {
+                nextAsteroidSpawn = DateTime.Now.AddMilliseconds(asteroidSpawnDelay);
+                if (asteroidSpawnDelay > 150)
+                    asteroidSpawnDelay -= 50;
+                AddAsteroid(null);
+            }
+
             if (IsGameOver && Input.GetKeyDown(KeyCode.R))
             {
                 IsGameOver = false;
