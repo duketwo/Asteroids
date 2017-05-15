@@ -31,7 +31,7 @@ namespace Assets.Resources.Scripts
         {
         }
 
-        public void Init()
+        public void Init(AsteroidType? type)
         {
             direction = DIRECTIONS[Random.Range(0, DIRECTIONS.Count)];
             sr = this.gameObject.AddComponent<SpriteRenderer>();
@@ -42,6 +42,19 @@ namespace Assets.Resources.Scripts
             rb = this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
 
+            if (type == null) // pick random type if type is null
+            {
+                Array values = Enum.GetValues(typeof(AsteroidType));
+                type = (AsteroidType)values.GetValue(Random.Range(0, values.Length));
+            }
+            else
+            {
+                this.type = type.Value;
+            }
+
+
+            this.tag = type.ToString();
+            this.name = type.ToString();
             // calculate a random spawn position on one of the borders
             var rnd = Random.Range(0, 3);
             Vector3 cornerA = Vector3.zero;
@@ -90,11 +103,11 @@ namespace Assets.Resources.Scripts
     }
 
 
-    enum AsteroidType
+    public enum AsteroidType
     {
-        XL,
-        M,
-        S
+        AsteroidXL,
+        AsteroidM,
+        AsteroidS
     }
 
 

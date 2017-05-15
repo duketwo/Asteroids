@@ -16,6 +16,7 @@ namespace Assets.Resources.Scripts
         private float SPEED_CONSTANT = 9.0f;
         private DateTime timeDestroy;
 
+
         void Start()
         {
 
@@ -31,9 +32,16 @@ namespace Assets.Resources.Scripts
             col.isTrigger = true;
             rb = this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
+            this.tag = this.GetType().Name;
+            this.name = this.tag;
             this.direction = direction;
             this.transform.position = pos;
             this.transform.rotation = rotation;
+        }
+
+        private void OnTriggerEnter2D(Collider2D c)
+        {
+            Debug.Log("Collision");
         }
 
         void Update()
@@ -43,7 +51,6 @@ namespace Assets.Resources.Scripts
 
             if (timeDestroy < DateTime.Now)
                 Destroy(this.gameObject);
-
         }
 
     }

@@ -9,7 +9,7 @@ public sealed class GameManager : MonoBehaviour
     void Start()
     {
         _player = new GameObject().AddComponent<Player>();
-        AddAsteroid();
+        AddAsteroid(null);
     }
 
     private GameManager()
@@ -32,10 +32,10 @@ public sealed class GameManager : MonoBehaviour
         return _player;
     }
 
-    public void AddAsteroid()
+    public void AddAsteroid(AsteroidType? type)
     {
         var asteroid = new GameObject().AddComponent<Asteroid>();
-        asteroid.Init();
+        asteroid.Init(type);
     }
 
     void Update()

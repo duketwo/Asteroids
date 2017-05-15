@@ -57,6 +57,8 @@ namespace Assets.Resources.Scripts
             col.isTrigger = true;
             rb = this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
+            this.tag = this.GetType().Name;
+            this.name = this.tag;
 
         }
 
@@ -93,8 +95,6 @@ namespace Assets.Resources.Scripts
 
                 velocityVector2.x += Convert.ToSingle(cosAngle) * SPEED_CONSTANT * Time.deltaTime;
                 velocityVector2.y += Convert.ToSingle(sinAngle) * SPEED_CONSTANT * Time.deltaTime;
-
-                Debug.Log(velocityVector2.x + " " + velocityVector2.y);
 
                 if (velocityVector2.x > MAX_SPEED)
                     velocityVector2.x = MAX_SPEED;
