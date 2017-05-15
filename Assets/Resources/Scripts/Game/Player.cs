@@ -133,7 +133,7 @@ namespace Assets.Resources.Scripts.Game
             if (c.tag != Asteroid.TAG)
                 return;
             Debug.Log("Player colllided with asteroid.");
-            GameManager.Instance().RespawnPlayer();
+            GameManager.Instance().PlayerCollided();
         }
 
         void Update()
