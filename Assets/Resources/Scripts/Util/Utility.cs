@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Assets.Resources.Scripts
+namespace Assets.Resources.Scripts.Util
 {
     public static class Utility
     {

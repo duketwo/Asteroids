@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Assets.Resources.Scripts.Util;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Assets.Resources.Scripts
+namespace Assets.Resources.Scripts.Game
 {
     class Asteroid : MonoBehaviour
     {
@@ -55,7 +54,7 @@ namespace Assets.Resources.Scripts
             if (type == null) // pick random type if type is null
             {
                 Array values = Enum.GetValues(typeof(AsteroidType));
-                this.type = (AsteroidType)values.GetValue(Random.Range(0, values.Length));                
+                this.type = (AsteroidType)values.GetValue(Random.Range(0, values.Length));
             }
             else
             {
@@ -126,8 +125,12 @@ namespace Assets.Resources.Scripts
         public void Update()
         {
             Utility.ScreenWrap(this.transform);
-            transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
             this.transform.Rotate(0, 0, 1);
+
+            if (GameManager.Instance().IsGameOver)
+                return;
+
+            transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
         }
 
         private void Scale()

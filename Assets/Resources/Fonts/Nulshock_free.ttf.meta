@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 07bda37d986d7c04f9e46fb6a6cf2007
+timeCreated: 1494865722
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Nulshock
+  fontNames:
+  - Nulshock
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

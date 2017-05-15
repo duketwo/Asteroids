@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Assets.Resources.Scripts.Util;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.VR.WSA;
 
-namespace Assets.Resources.Scripts
+namespace Assets.Resources.Scripts.Game
 {
     public class Player : MonoBehaviour
     {
@@ -17,7 +14,7 @@ namespace Assets.Resources.Scripts
         public float rightConstraint = 0.0f;
         public float buffer = 1.0f;
         public float distanceZ = 10.0f;
-
+        public static string TAG = "PLAYER";
 
         private SpriteRenderer sr;
         private double degree;
@@ -31,7 +28,6 @@ namespace Assets.Resources.Scripts
         private DateTime lastShot;
         private PolygonCollider2D col;
         private Rigidbody2D rb;
-        public static string TAG = "PLAYER";
         private DateTime invulnUntil;
 
 
@@ -65,7 +61,7 @@ namespace Assets.Resources.Scripts
 
         }
 
-        public Player SetInvuln(int milliseconds = 2500)
+        public Player SetInvuln(int milliseconds = 1500)
         {
             invulnUntil = DateTime.Now.AddMilliseconds(milliseconds);
             return this;
@@ -142,11 +138,17 @@ namespace Assets.Resources.Scripts
 
         void Update()
         {
-            if (invulnUntil > DateTime.Now) { 
+
+            if (GameManager.Instance().IsGameOver)
+                return;
+
+            if (invulnUntil > DateTime.Now)
+            {
                 col.enabled = false;
                 sr.color = Color.grey;
             }
-            else { 
+            else
+            {
                 col.enabled = true;
                 sr.color = Color.green;
             }

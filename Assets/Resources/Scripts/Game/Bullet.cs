@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Assets.Resources.Scripts.Util;
 using UnityEngine;
 
-namespace Assets.Resources.Scripts
+namespace Assets.Resources.Scripts.Game
 {
     class Bullet : MonoBehaviour
     {
@@ -72,6 +70,10 @@ namespace Assets.Resources.Scripts
 
         void Update()
         {
+
+            if (GameManager.Instance().IsGameOver)
+                return;
+
             Utility.ScreenWrap(this.transform);
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
 
