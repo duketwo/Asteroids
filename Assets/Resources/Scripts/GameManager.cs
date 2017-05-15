@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using Assets.Resources.Scripts;
 using UnityEngine;
 
-public sealed class GameManager : MonoBehaviour {
+public sealed class GameManager : MonoBehaviour
+{
 
-	// Use this for initialization
-	void Start () {
-	    _player = new GameObject().AddComponent<Player>();
+    void Start()
+    {
+        _player = new GameObject().AddComponent<Player>();
+        AddAsteroid();
     }
 
     private GameManager()
     {
-        
+
     }
 
     private static volatile GameManager instance;
@@ -24,15 +26,20 @@ public sealed class GameManager : MonoBehaviour {
         return instance;
     }
 
-
     private Player _player;
     public Player Player()
     {
         return _player;
     }
 
-    // Update is called once per frame
-    void Update () {
-		
-	}
+    public void AddAsteroid()
+    {
+        var asteroid = new GameObject().AddComponent<Asteroid>();
+        asteroid.Init();
+    }
+
+    void Update()
+    {
+
+    }
 }

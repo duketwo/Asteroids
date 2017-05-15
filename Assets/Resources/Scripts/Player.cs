@@ -21,13 +21,14 @@ namespace Assets.Resources.Scripts
 
         private SpriteRenderer sp;
         private double degree;
-        private double speed;
         private Vector2 velocityVector2;
         private Material mat;
         private List<Vector3> positions;
-        private float SPEED_STEP_INCREASE = 4.5f;
-        private float MAX_SPEED = 10.0f;
+        private float SPEED_CONSTANT = 4.5f;
+        private float MAX_SPEED = 6.0f;
         private Quaternion initialRotation;
+        private GameObject bulletSpawnSpot;
+        private DateTime lastShot;
 
 
         void Awake()
@@ -41,38 +42,17 @@ namespace Assets.Resources.Scripts
         void Start()
         {
             degree = 0;
-            speed = 0;
             sp = this.gameObject.AddComponent<SpriteRenderer>();
             sp.sortingLayerName = "Foreground";
             sp.sprite = UnityEngine.Resources.Load<Sprite>("Images/spaceship_triangle");
             velocityVector2 = new Vector2(0, 0);
             initialRotation = this.transform.localRotation;
-        }
+            bulletSpawnSpot = new GameObject();
+            bulletSpawnSpot.transform.position = this.transform.position + new Vector3(0, 1.0f);
+            bulletSpawnSpot.transform.SetParent(this.transform);
+            lastShot = DateTime.MinValue;
 
-        //        void DrawShip()
-        //        {
-        //
-        //            lr.startWidth = 0.2f;
-        //            lr.endWidth = 0.2f;
-        //
-        //            var pos = this.gameObject.transform.position;
-        //
-        //            var p0 = new Vector2(pos.x, pos.y + 0.5f);
-        //            var p1 = new Vector2(pos.x + 0.5f, pos.y - 0.5f);
-        //            var p2 = new Vector2(pos.x, pos.y);
-        //            var p3 = new Vector2(pos.x - 0.5f, pos.y - 0.5f);
-        //            var p4 = new Vector2(pos.x, pos.y + 0.5f);
-        //
-        //
-        //            positions = new List<Vector3> { p0, p1, p2, p3, p4, }.Select(c =>
-        //              {
-        //                  var k = Rotate(c, pos, new Vector3(0, 0, (float)degree));
-        //                  return k;
-        //              }).ToList();
-        //
-        //            lr.SetPositions(positions.ToArray());
-        //            lr.positionCount = positions.Count;
-        //        }
+        }
 
         public Vector3 Rotate(Vector3 point, Vector3 pivot, Vector3 angles)
         {
@@ -105,14 +85,22 @@ namespace Assets.Resources.Scripts
                 double cosAngle = Math.Sin(rad);
 
 
-                velocityVector2.x += Convert.ToSingle(cosAngle) * SPEED_STEP_INCREASE * Time.deltaTime;
-                velocityVector2.y += Convert.ToSingle(sinAngle) * SPEED_STEP_INCREASE * Time.deltaTime;
+                velocityVector2.x += Convert.ToSingle(cosAngle) * SPEED_CONSTANT * Time.deltaTime;
+                velocityVector2.y += Convert.ToSingle(sinAngle) * SPEED_CONSTANT * Time.deltaTime;
+
+                Debug.Log(velocityVector2.x + " " + velocityVector2.y);
 
                 if (velocityVector2.x > MAX_SPEED)
                     velocityVector2.x = MAX_SPEED;
 
+                if(velocityVector2.x < -MAX_SPEED)
+                    velocityVector2.x = -MAX_SPEED;
+
                 if (velocityVector2.y > MAX_SPEED)
                     velocityVector2.y = MAX_SPEED;
+
+                if (velocityVector2.y < -MAX_SPEED)
+                    velocityVector2.y = -MAX_SPEED;
             }
             else
             {
@@ -120,7 +108,7 @@ namespace Assets.Resources.Scripts
                 velocityVector2.y -= velocityVector2.y * 0.3f * Time.deltaTime;
             }
 
-            transform.position += new Vector3(velocityVector2.x, velocityVector2.y, 0) * SPEED_STEP_INCREASE * Time.smoothDeltaTime;
+            transform.position += new Vector3(velocityVector2.x, velocityVector2.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
         }
 
         public void Respawn()
@@ -128,19 +116,31 @@ namespace Assets.Resources.Scripts
 
         }
 
-        void Update()
+        public void Shoot()
         {
-           
+            var bullet = new GameObject().AddComponent<Bullet>();
+            bullet.Init(bulletSpawnSpot.transform.position - this.transform.position, bulletSpawnSpot.transform.position, bulletSpawnSpot.transform.rotation);
         }
 
-        void FixedUpdate()
+        void Update()
         {
             var v = Input.GetAxis("Vertical");
             var h = Input.GetAxis("Horizontal");
 
+            if (Input.GetKey(KeyCode.Space) && lastShot < DateTime.Now)
+            {
+                Shoot();
+                lastShot = DateTime.Now.AddMilliseconds(100);
+            }
+
             ModAcceleration(v);
             Utility.ScreenWrap(this.transform);
             SetDegree(h);
+        }
+
+        void FixedUpdate()
+        {
+
         }
     }
 }

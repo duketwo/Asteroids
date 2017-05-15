@@ -9,24 +9,41 @@ namespace Assets.Resources.Scripts
     class Bullet : MonoBehaviour
     {
 
-        private SpriteRenderer sp;
+        private PolygonCollider2D col;
+        private Rigidbody2D rb;
+        private SpriteRenderer sr;
         private Vector3 direction;
+        private float SPEED_CONSTANT = 9.0f;
+        private DateTime timeDestroy;
 
         void Start()
         {
-            sp = this.gameObject.AddComponent<SpriteRenderer>();
-            sp.sortingLayerName = "Foreground";
-            sp.sprite = UnityEngine.Resources.Load<Sprite>("Images/laser");
+
         }
 
-        public void Init(Vector3 direction)
+        public void Init(Vector3 direction, Vector3 pos, Quaternion rotation)
         {
+            timeDestroy = DateTime.Now.AddSeconds(3);
+            sr = this.gameObject.AddComponent<SpriteRenderer>();
+            sr.sortingLayerName = "Foreground";
+            sr.sprite = UnityEngine.Resources.Load<Sprite>("Images/laser");
+            col = this.gameObject.AddComponent<PolygonCollider2D>();
+            col.isTrigger = true;
+            rb = this.gameObject.AddComponent<Rigidbody2D>();
+            rb.isKinematic = true;
             this.direction = direction;
+            this.transform.position = pos;
+            this.transform.rotation = rotation;
         }
 
         void Update()
         {
             Utility.ScreenWrap(this.transform);
+            transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
+
+            if (timeDestroy < DateTime.Now)
+                Destroy(this.gameObject);
+
         }
 
     }
