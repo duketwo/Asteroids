@@ -19,6 +19,8 @@ namespace Assets.Resources.Scripts
         public static Vector3 topRightCorner = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0.0f, cameraDistZ));
         public static Vector3 botLeftCorner = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, Screen.height, cameraDistZ));
         public static Vector3 botRightCorner = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, cameraDistZ));
+        public static Vector3 center = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width/2, Screen.height/2, cameraDistZ));
+
 
         public static void ScreenWrap(Transform transform)
         {

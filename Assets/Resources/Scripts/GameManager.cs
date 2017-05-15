@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Resources.Scripts;
 using UnityEngine;
+using UnityEngine.Networking.NetworkSystem;
 
 public sealed class GameManager : MonoBehaviour
 {
@@ -18,6 +19,18 @@ public sealed class GameManager : MonoBehaviour
     private GameManager()
     {
 
+    }
+
+    public Player AddPlayer()
+    {
+        _player = new GameObject().AddComponent<Player>();
+        return _player;
+    }
+
+    public void RespawnPlayer()
+    {
+        Destroy(_player.gameObject);
+        AddPlayer().SetInvuln().gameObject.transform.position = Utility.center;
     }
 
     private static volatile GameManager instance;

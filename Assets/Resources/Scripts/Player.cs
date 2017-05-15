@@ -32,6 +32,7 @@ namespace Assets.Resources.Scripts
         private PolygonCollider2D col;
         private Rigidbody2D rb;
         public static string TAG = "PLAYER";
+        private DateTime invulnUntil;
 
 
         void Awake()
@@ -60,7 +61,14 @@ namespace Assets.Resources.Scripts
             rb.isKinematic = true;
             this.tag = TAG;
             this.name = this.GetType().Name;
+            SetInvuln();
 
+        }
+
+        public Player SetInvuln(int milliseconds = 2500)
+        {
+            invulnUntil = DateTime.Now.AddMilliseconds(milliseconds);
+            return this;
         }
 
         public Vector3 Rotate(Vector3 point, Vector3 pivot, Vector3 angles)
@@ -100,7 +108,7 @@ namespace Assets.Resources.Scripts
                 if (velocityVector2.x > MAX_SPEED)
                     velocityVector2.x = MAX_SPEED;
 
-                if(velocityVector2.x < -MAX_SPEED)
+                if (velocityVector2.x < -MAX_SPEED)
                     velocityVector2.x = -MAX_SPEED;
 
                 if (velocityVector2.y > MAX_SPEED)
@@ -118,11 +126,6 @@ namespace Assets.Resources.Scripts
             transform.position += new Vector3(velocityVector2.x, velocityVector2.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
         }
 
-        public void Respawn()
-        {
-
-        }
-
         public void Shoot()
         {
             var bullet = new GameObject().AddComponent<Bullet>();
@@ -131,15 +134,23 @@ namespace Assets.Resources.Scripts
 
         private void OnTriggerEnter2D(Collider2D c)
         {
-            if (c.tag == Asteroid.TAG)
-            {
-                Debug.Log("Player colllided with asteroid.");
-            }
-
+            if (c.tag != Asteroid.TAG)
+                return;
+            Debug.Log("Player colllided with asteroid.");
+            GameManager.Instance().RespawnPlayer();
         }
 
         void Update()
         {
+            if (invulnUntil > DateTime.Now) { 
+                col.enabled = false;
+                sr.color = Color.grey;
+            }
+            else { 
+                col.enabled = true;
+                sr.color = Color.green;
+            }
+
             var v = Input.GetAxis("Vertical");
             var h = Input.GetAxis("Horizontal");
 

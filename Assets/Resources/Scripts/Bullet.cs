@@ -52,7 +52,7 @@ namespace Assets.Resources.Scripts
             var asteroid = c.gameObject.GetComponent<Asteroid>();
             var direction = asteroid.direction;
             var direcIndex = asteroid.DIRECTIONS.IndexOf(direction);
-            var orthoDirectPos = asteroid.DIRECTIONS[(direcIndex - 1 + asteroid.DIRECTIONS.Count) % (asteroid.DIRECTIONS.Count - 1)];
+            var orthoDirectPos = asteroid.DIRECTIONS[(direcIndex - 1 + asteroid.DIRECTIONS.Count - 1) % (asteroid.DIRECTIONS.Count - 1)];
             var orthoDirectNeg = asteroid.DIRECTIONS[(direcIndex + 1) % (asteroid.DIRECTIONS.Count - 1)];
             switch (asteroid.type)
             {
