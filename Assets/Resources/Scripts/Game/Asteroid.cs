@@ -95,7 +95,7 @@ namespace Assets.Resources.Scripts.Game
                         break;
                     case 1:
                         cornerA = Utility.topLeftCorner;
-                        cornerB = Utility.botRightCorner;
+                        cornerB = Utility.topRightCorner;
                         break;
                     case 2:
                         cornerA = Utility.topRightCorner;

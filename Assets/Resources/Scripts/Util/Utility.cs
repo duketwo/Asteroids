@@ -12,10 +12,10 @@ namespace Assets.Resources.Scripts.Util
         private static float bottomConstraint = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, Screen.height, cameraDistZ)).y;
 
         public static Vector3 topLeftCorner = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, 0.0f, cameraDistZ));
-        public static Vector3 topRightCorner = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0.0f, cameraDistZ));
+        public static Vector3 topRightCorner = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, Screen.width, cameraDistZ));
         public static Vector3 botLeftCorner = Camera.main.ScreenToWorldPoint(new Vector3(0.0f, Screen.height, cameraDistZ));
         public static Vector3 botRightCorner = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, cameraDistZ));
-        public static Vector3 center = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width/2, Screen.height/2, cameraDistZ));
+        public static Vector3 center = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, cameraDistZ));
 
 
         public static void ScreenWrap(Transform transform)
