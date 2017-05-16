@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Resources.Scripts.Util;
 using UnityEngine;
+using UnityEngine.Networking;
 using Random = UnityEngine.Random;
+using Utility = Assets.Resources.Scripts.Util.Utility;
 
 namespace Assets.Resources.Scripts.Game
 {
-    class Asteroid : MonoBehaviour
+    class Asteroid : NetworkBehaviour
     {
-        public AsteroidType type;
+        public AsteroidType Type { get; private set; }
         private PolygonCollider2D col;
         private Rigidbody2D rb;
         private SpriteRenderer sr;
         public Vector2 direction;
         private float SPEED_CONSTANT = 4.0f;
         public static string TAG = "ASTEROID";
+        private NetworkIdentity networkIdentity;
+        private NetworkTransform networkTransform;
 
         private static Dictionary<AsteroidType, int> asteroidEntropyDictionary = new Dictionary<AsteroidType, int>()
         {
@@ -24,7 +27,7 @@ namespace Assets.Resources.Scripts.Game
             {AsteroidType.AsteroidS, 0}
         };
 
-        public List<Vector2> DIRECTIONS = new List<Vector2>()
+        public static List<Vector2> DIRECTIONS = new List<Vector2>()
         {
             new Vector2(0,1),
             new Vector2(1,1),
@@ -36,63 +39,38 @@ namespace Assets.Resources.Scripts.Game
             new Vector2(-1,1),
         };
 
-        public void Start()
+        public void Awake()
         {
-
-        }
-
-
-        private static AsteroidType GetSemiRandomAsteroidType()
-        {
-            if (asteroidEntropyDictionary.Values.All(k => k >= 10))
-            {
-                asteroidEntropyDictionary[AsteroidType.AsteroidL] = 0;
-                asteroidEntropyDictionary[AsteroidType.AsteroidM] = 0;
-                asteroidEntropyDictionary[AsteroidType.AsteroidS] = 0;
-            }
-
-            foreach (var kv in asteroidEntropyDictionary)
-            {
-                Debug.Log(kv.Key + " " + kv.Value);
-            }
-            var l = asteroidEntropyDictionary.Where(k => k.Value < 10);
-            var rnd = l.ElementAt(Random.Range(0, l.Count()));
-            asteroidEntropyDictionary[rnd.Key]++;
-            return rnd.Key;
-        }
-
-        public Asteroid Init(AsteroidType? type, Vector2? direction, Vector3? position = null)
-        {
-
-            if (direction == null)
-            {
-                this.direction = DIRECTIONS[Random.Range(0, DIRECTIONS.Count)];
-            }
+            if (this.GetComponent<NetworkIdentity>() == null)
+                networkIdentity = this.gameObject.AddComponent<NetworkIdentity>();
             else
-            {
-                this.direction = direction.Value;
-            }
+                networkIdentity = this.gameObject.GetComponent<NetworkIdentity>();
+            networkIdentity.localPlayerAuthority = true;
 
-            sr = this.gameObject.GetComponent<SpriteRenderer>() != null ? this.gameObject.GetComponent<SpriteRenderer>() : this.gameObject.AddComponent<SpriteRenderer>();
+            if (this.GetComponent<NetworkTransform>() == null)
+                networkTransform = this.gameObject.AddComponent<NetworkTransform>();
+            else
+                networkTransform = this.gameObject.GetComponent<NetworkTransform>();
+            networkTransform.sendInterval = 1.0f;
+            this.tag = TAG;
+
+        }
+
+        public void SetRandomDirection()
+        {
+            this.direction = GetRandomDirection();
+        }
+
+        public void SetAsteroidType(AsteroidType? type = null)
+        {
+            sr = this.gameObject.GetComponent<SpriteRenderer>() != null
+                ? this.gameObject.GetComponent<SpriteRenderer>()
+                : this.gameObject.AddComponent<SpriteRenderer>();
             sr.sortingLayerName = "Foreground";
-            sr.sprite = UnityEngine.Resources.Load<Sprite>("Images/square");
-            col = this.gameObject.GetComponent<PolygonCollider2D>() != null ? this.gameObject.GetComponent<PolygonCollider2D>() : this.gameObject.AddComponent<PolygonCollider2D>();
-            col.isTrigger = true;
-            rb = this.gameObject.GetComponent<Rigidbody2D>() != null ? this.gameObject.GetComponent<Rigidbody2D>() : this.gameObject.AddComponent<Rigidbody2D>();
-            rb.isKinematic = true;
 
-            if (type == null) // pick random type if type is null
-            {
-                //Array values = Enum.GetValues(typeof(AsteroidType));
-                //this.type = (AsteroidType)values.GetValue(Random.Range(0, values.Length));
-                this.type = GetSemiRandomAsteroidType();
-            }
-            else
-            {
-                this.type = type.Value;
-            }
 
-            switch (this.type)
+            this.Type = type == null ? GetSemiRandomAsteroidType() : type.Value;
+            switch (this.Type)
             {
                 case AsteroidType.AsteroidS:
                     sr.sprite = UnityEngine.Resources.Load<Sprite>("Images/square_s");
@@ -106,51 +84,72 @@ namespace Assets.Resources.Scripts.Game
                     sr.sprite = UnityEngine.Resources.Load<Sprite>("Images/square_l");
                     break;
             }
+            this.name = this.Type.ToString();
 
+            col = this.gameObject.GetComponent<PolygonCollider2D>() != null
+                ? this.gameObject.GetComponent<PolygonCollider2D>()
+                : this.gameObject.AddComponent<PolygonCollider2D>();
+            col.isTrigger = true;
+            rb = this.gameObject.GetComponent<Rigidbody2D>() != null
+                ? this.gameObject.GetComponent<Rigidbody2D>()
+                : this.gameObject.AddComponent<Rigidbody2D>();
+            rb.isKinematic = true;
 
-            this.tag = TAG;
-            this.name = this.type.ToString();
+       
+        }
 
+        public void SetRandomPosition()
+        {
+            var rnd = Random.Range(0, 3);
+            Vector3 cornerA = Vector3.zero;
+            Vector3 cornerB = Vector3.zero;
 
-            if (position == null)
+            switch (rnd)
             {
-                var rnd = Random.Range(0, 3);
-                Vector3 cornerA = Vector3.zero;
-                Vector3 cornerB = Vector3.zero;
-
-                switch (rnd)
-                {
-                    case 0:
-                        cornerA = Utility.topLeftCorner;
-                        cornerB = Utility.botLeftCorner;
-                        break;
-                    case 1:
-                        cornerA = Utility.topLeftCorner;
-                        cornerB = Utility.topRightCorner;
-                        break;
-                    case 2:
-                        cornerA = Utility.topRightCorner;
-                        cornerB = Utility.botRightCorner;
-                        break;
-                    case 3:
-                        cornerA = Utility.botLeftCorner;
-                        cornerB = Utility.botRightCorner;
-                        break;
-                }
-
-                var xMin = cornerA.x < cornerB.x ? cornerA.x : cornerB.x;
-                var xMax = cornerA.x > cornerB.x ? cornerA.x : cornerB.x;
-                var yMin = cornerA.y < cornerB.y ? cornerA.y : cornerB.y;
-                var yMax = cornerA.y > cornerB.y ? cornerA.y : cornerB.y;
-
-                this.transform.position = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), cornerB.z);
-            }
-            else
-            {
-                this.transform.position = position.Value;
+                case 0:
+                    cornerA = Utility.topLeftCorner;
+                    cornerB = Utility.botLeftCorner;
+                    break;
+                case 1:
+                    cornerA = Utility.topLeftCorner;
+                    cornerB = Utility.topRightCorner;
+                    break;
+                case 2:
+                    cornerA = Utility.topRightCorner;
+                    cornerB = Utility.botRightCorner;
+                    break;
+                case 3:
+                    cornerA = Utility.botLeftCorner;
+                    cornerB = Utility.botRightCorner;
+                    break;
             }
 
-            return this;
+            var xMin = cornerA.x < cornerB.x ? cornerA.x : cornerB.x;
+            var xMax = cornerA.x > cornerB.x ? cornerA.x : cornerB.x;
+            var yMin = cornerA.y < cornerB.y ? cornerA.y : cornerB.y;
+            var yMax = cornerA.y > cornerB.y ? cornerA.y : cornerB.y;
+
+            this.transform.position = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), cornerB.z);
+        }
+
+        public static AsteroidType GetSemiRandomAsteroidType()
+        {
+            if (asteroidEntropyDictionary.Values.All(k => k >= 10))
+            {
+                asteroidEntropyDictionary[AsteroidType.AsteroidL] = 0;
+                asteroidEntropyDictionary[AsteroidType.AsteroidM] = 0;
+                asteroidEntropyDictionary[AsteroidType.AsteroidS] = 0;
+            }
+
+            var l = asteroidEntropyDictionary.Where(k => k.Value < 10);
+            var rnd = l.ElementAt(Random.Range(0, l.Count()));
+            asteroidEntropyDictionary[rnd.Key]++;
+            return rnd.Key;
+        }
+
+        public static Vector2 GetRandomDirection()
+        {
+            return DIRECTIONS[Random.Range(0, DIRECTIONS.Count)];
         }
 
         public void Update()

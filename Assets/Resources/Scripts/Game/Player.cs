@@ -25,7 +25,7 @@ namespace Assets.Resources.Scripts.Game
         private DateTime invulnUntil;
         private NetworkIdentity networkIdentity;
         private NetworkTransform networkTransform;
-        private bool dead;        
+        private bool dead;
 
         void Start()
         {
@@ -37,7 +37,7 @@ namespace Assets.Resources.Scripts.Game
 
             sr.sortingLayerName = "Foreground";
             sr.sprite = UnityEngine.Resources.Load<Sprite>("Images/spaceship_triangle");
-            velocityVector2 = new Vector2(0, 0);
+            velocityVector2 = Vector2.zero;
             initialRotation = this.transform.localRotation;
             bulletSpawnSpot = new GameObject();
             bulletSpawnSpot.transform.position = this.transform.position + new Vector3(0, 1.0f);
@@ -139,15 +139,11 @@ namespace Assets.Resources.Scripts.Game
         [Command]
         public void CmdShoot()
         {
-            //if (bulletPrefab == null)
-                //bulletPrefab = UnityEngine.Resources.Load<GameObject>("Bullet");
-
             var obj = (GameObject)Instantiate(UnityEngine.Resources.Load<GameObject>("Bullet"));
             var bulletScript = obj.GetComponent<Bullet>();
             bulletScript.direction = bulletSpawnSpot.transform.position - this.transform.position;
             bulletScript.transform.position = bulletSpawnSpot.transform.position;
             bulletScript.transform.rotation = bulletSpawnSpot.transform.rotation;
-            //bulletScript.Init(bulletSpawnSpot.transform.position - this.transform.position, bulletSpawnSpot.transform.position, bulletSpawnSpot.transform.rotation);
             NetworkServer.Spawn(obj);
         }
 
@@ -170,9 +166,19 @@ namespace Assets.Resources.Scripts.Game
             }
             else
             {
-                CustomNetworkManager.Instance().RespawnPlayer();
+                Respawn();
             }
 
+        }
+
+        public void Respawn()
+        {
+            SetInvuln();
+            this.transform.position = Util.Utility.center;
+            dead = false;
+            this.gameObject.transform.localRotation = initialRotation;
+            this.velocityVector2 = Vector2.zero;
+            this.degree = 0;
         }
 
 

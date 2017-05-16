@@ -82,8 +82,6 @@ namespace Assets.Resources.Scripts.Game.Menu
             GUILayout.EndArea();
         }
 
-        private float currentPercentage = 1.0f;
-
         public void Init()
         {
             Rect screenRect = AspectUtility.screenRect;

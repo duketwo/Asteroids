@@ -54,29 +54,61 @@ namespace Assets.Resources.Scripts.Game
             if (collidedAlready || c.tag != Asteroid.TAG)
                 return;
 
-            Debug.Log("Bullet colllided with an asteroid.");
+
             collidedAlready = true;
 
             CustomNetworkManager.Instance().StatusBar().Points += CustomNetworkManager.POINTS_ASTEROID;
 
             var asteroid = c.gameObject.GetComponent<Asteroid>();
+
+            Debug.Log("Bullet colllided with an asteroid. Type: " + asteroid.Type);
+
             var direction = asteroid.direction;
-            var direcIndex = asteroid.DIRECTIONS.IndexOf(direction);
-            var orthoDirectPos = asteroid.DIRECTIONS[(direcIndex - 1 + asteroid.DIRECTIONS.Count - 1) % (asteroid.DIRECTIONS.Count - 1)];
-            var orthoDirectNeg = asteroid.DIRECTIONS[(direcIndex + 1) % (asteroid.DIRECTIONS.Count - 1)];
-            switch (asteroid.type)
+            var direcIndex = Asteroid.DIRECTIONS.IndexOf(direction);
+            var orthoDirectPos = Asteroid.DIRECTIONS[(direcIndex - 1 + Asteroid.DIRECTIONS.Count - 1) % (Asteroid.DIRECTIONS.Count - 1)];
+            var orthoDirectNeg = Asteroid.DIRECTIONS[(direcIndex + 1) % (Asteroid.DIRECTIONS.Count - 1)];
+            switch (asteroid.Type)
             {
                 case AsteroidType.AsteroidL:
-                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectPos).transform.position = c.transform.position;
-                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectNeg).transform.position = c.transform.position;
+                    var asteroidMOrthoPos = new GameObject();
+                    var asteroidMScriptCompOrthoPos = asteroidMOrthoPos.AddComponent<Asteroid>();
+                    asteroidMScriptCompOrthoPos.SetAsteroidType(AsteroidType.AsteroidM);
+                    asteroidMOrthoPos.transform.position = c.transform.position;
+                    asteroidMScriptCompOrthoPos.direction = orthoDirectPos;
+                    
+
+                    var asteroidMOrthoNeg = new GameObject();
+                    var asteroidMScriptCompOrthoNeg = asteroidMOrthoNeg.AddComponent<Asteroid>();
+                    asteroidMScriptCompOrthoNeg.SetAsteroidType(AsteroidType.AsteroidM);
+                    asteroidMOrthoNeg.transform.position = c.transform.position;
+                    asteroidMScriptCompOrthoNeg.direction = orthoDirectNeg;
+                    
+
+                    //new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectPos).transform.position = c.transform.position;
+                    //new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectNeg).transform.position = c.transform.position;
                     break;
                 case AsteroidType.AsteroidM:
-                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectPos).transform.position = c.transform.position;
-                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectNeg).transform.position = c.transform.position;
+                    var asteroidSOrthoPos = new GameObject();
+                    var asteroidSScriptCompOrthoPos = asteroidSOrthoPos.AddComponent<Asteroid>();
+                    asteroidSScriptCompOrthoPos.SetAsteroidType(AsteroidType.AsteroidS);
+                    asteroidSOrthoPos.transform.position = c.transform.position;
+                    asteroidSScriptCompOrthoPos.direction = orthoDirectPos;
+                    
+
+                    var asteroidSOrthoNeg = new GameObject();
+                    var asteroidSScriptCompOrthoNeg = asteroidSOrthoNeg.AddComponent<Asteroid>();
+                    asteroidSScriptCompOrthoNeg.SetAsteroidType(AsteroidType.AsteroidS);
+                    asteroidSOrthoNeg.transform.position = c.transform.position;
+                    asteroidSScriptCompOrthoNeg.direction = orthoDirectNeg;
+                    
+
+                    //                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectPos).transform.position = c.transform.position;
+                    //                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectNeg).transform.position = c.transform.position;
                     break;
             }
 
             Destroy(c.gameObject);
+            //NetworkServer.Destroy(c.gameObject);
             Destroy(this.gameObject);
             NetworkServer.Destroy(this.gameObject);
         }
