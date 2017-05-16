@@ -38,6 +38,7 @@ namespace Assets.Resources.Scripts.Game
 
         public void Start()
         {
+
         }
 
 

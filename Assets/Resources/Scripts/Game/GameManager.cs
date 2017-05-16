@@ -41,6 +41,7 @@ namespace Assets.Resources.Scripts.Game
 
         public StatusBar AddStatusBar()
         {
+            FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
             _statusBar = new GameObject().AddComponent<StatusBar>();
             _statusBar.Init();
             return _statusBar;
@@ -56,7 +57,9 @@ namespace Assets.Resources.Scripts.Game
         {
             StatusBar().Lives = 3;
 
+            FindObjectsOfType<Player>().ToList().ForEach(k => Destroy(k.gameObject));
             new GameObject().AddComponent<Player>();
+            
 
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
@@ -64,6 +67,12 @@ namespace Assets.Resources.Scripts.Game
             for (int i = 0; i < 10; i++)
                 AddAsteroid(null);
             isGameStarted = true;
+        }
+
+        public void RespawnPlayer()
+        {
+            FindObjectsOfType<Player>().ToList().ForEach(k => Destroy(k.gameObject));
+            new GameObject().AddComponent<Player>();
         }
 
 

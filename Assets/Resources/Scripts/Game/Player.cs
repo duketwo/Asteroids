@@ -163,7 +163,7 @@ namespace Assets.Resources.Scripts.Game
             }
             else
             {
-                //                GameManager.Instance().networkManager.PlayerWasKilled();
+                GameManager.Instance().RespawnPlayer();
             }
 
         }
