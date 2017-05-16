@@ -19,11 +19,13 @@ namespace Assets.Resources.Scripts.Game
             GameManager.Instance().StartGame();
             this.conn = conn;
             this.playerControllerId = playerControllerId;
-            playerPrefab = PlayerPrefab;
-            GameObject player = Instantiate(PlayerPrefab);
+            //playerPrefab = PlayerPrefab;
+            GameObject player = Instantiate(playerPrefab);
             player.SetActive(true);
+            player.AddComponent<Player>();
             localPlayer = player.GetComponent<Player>();
             NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
+            Debug.Log("PlayerId: " + playerControllerId);
         }
 
         public void PlayerWasKilled()
@@ -34,26 +36,26 @@ namespace Assets.Resources.Scripts.Game
             var conn = localPlayer.connectionToClient;
             Destroy(localPlayer.gameObject);
 
-            GameObject player = Instantiate(PlayerPrefab);
+            GameObject player = Instantiate(playerPrefab);
             player.SetActive(true);
             localPlayer = player.GetComponent<Player>();
             NetworkServer.ReplacePlayerForConnection(conn, player, playerControllerId);
         }
 
 
-        private GameObject _playerPrefab;
-        public GameObject PlayerPrefab
-        {
-            get
-            {
-                if (_playerPrefab == null)
-                {
-                    _playerPrefab = new GameObject();
-                    _playerPrefab.SetActive(false);
-                    _playerPrefab.AddComponent<Player>();
-                }
-                return _playerPrefab;
-            }
-        }
+//        private GameObject _playerPrefab;
+//        public GameObject PlayerPrefab
+//        {
+//            get
+//            {
+//                if (_playerPrefab == null)
+//                {
+//                    _playerPrefab = new GameObject();
+//                    _playerPrefab.SetActive(false);
+//                    _playerPrefab.AddComponent<Player>();
+//                }
+//                return _playerPrefab;
+//            }
+//        }
     }
 }

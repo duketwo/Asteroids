@@ -25,13 +25,18 @@ namespace Assets.Resources.Scripts.Game
         private Rigidbody2D rb;
         private DateTime invulnUntil;
         private NetworkIdentity networkIdentity;
+        private NetworkTransform networkTransform;
         private bool dead;
 
 
         void Start()
         {
             degree = 0;
-            sr = this.gameObject.AddComponent<SpriteRenderer>();
+            if (this.gameObject.GetComponent<SpriteRenderer>() == null)
+                sr = this.gameObject.AddComponent<SpriteRenderer>();
+            else
+                sr = this.gameObject.GetComponent<SpriteRenderer>();
+
             sr.sortingLayerName = "Foreground";
             sr.sprite = UnityEngine.Resources.Load<Sprite>("Images/spaceship_triangle");
             velocityVector2 = new Vector2(0, 0);
@@ -40,16 +45,37 @@ namespace Assets.Resources.Scripts.Game
             bulletSpawnSpot.transform.position = this.transform.position + new Vector3(0, 1.0f);
             bulletSpawnSpot.transform.SetParent(this.transform);
             lastShot = DateTime.MinValue;
-            col = this.gameObject.AddComponent<PolygonCollider2D>();
+
+            if (this.gameObject.GetComponent<PolygonCollider2D>() == null)
+                col = this.gameObject.AddComponent<PolygonCollider2D>();
+            else
+                col = this.gameObject.GetComponent<PolygonCollider2D>();
+
             col.isTrigger = true;
-            rb = this.gameObject.AddComponent<Rigidbody2D>();
+
+
+            if (this.gameObject.GetComponent<Rigidbody2D>() == null)
+                rb = this.gameObject.AddComponent<Rigidbody2D>();
+            else
+                rb = this.gameObject.GetComponent<Rigidbody2D>();
+
             rb.isKinematic = true;
             this.tag = TAG;
             this.name = this.GetType().Name;
             SetInvuln();
             if (this.GetComponent<NetworkIdentity>() == null)
                 networkIdentity = this.gameObject.AddComponent<NetworkIdentity>();
-            this.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
+            else
+                networkIdentity = this.gameObject.GetComponent<NetworkIdentity>();
+            networkIdentity.localPlayerAuthority = true;
+
+            if (this.GetComponent<NetworkTransform>() == null)
+                networkTransform = this.gameObject.AddComponent<NetworkTransform>();
+            else
+                networkTransform = this.gameObject.GetComponent<NetworkTransform>();
+            networkTransform.sendInterval = 0.05f;
+
+
 
         }
 
@@ -109,7 +135,7 @@ namespace Assets.Resources.Scripts.Game
                 velocityVector2.y -= velocityVector2.y * 0.3f * Time.deltaTime;
             }
 
-            transform.position += new Vector3(velocityVector2.x, velocityVector2.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
+
         }
 
         public void Shoot()
@@ -137,7 +163,7 @@ namespace Assets.Resources.Scripts.Game
             }
             else
             {
-                GameManager.Instance().networkManager.PlayerWasKilled();
+                //                GameManager.Instance().networkManager.PlayerWasKilled();
             }
 
         }
@@ -147,7 +173,6 @@ namespace Assets.Resources.Scripts.Game
         {
             if (!isLocalPlayer)
             {
-                Debug.Log("Is not local player!");
                 return;
             }
 
@@ -177,6 +202,8 @@ namespace Assets.Resources.Scripts.Game
             ModAcceleration(v);
             Util.Utility.ScreenWrap(this.transform);
             SetDegree(h);
+
+            transform.position += new Vector3(velocityVector2.x, velocityVector2.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
         }
 
         void FixedUpdate()

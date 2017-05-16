@@ -18,7 +18,7 @@ namespace Assets.Resources.Scripts.Game
         private int asteroidSpawnDelay = 3000;
         private DateTime nextAsteroidSpawn;
         private GameObject networkManagerGameObject;
-        public MyNetworkManager networkManager;
+        public NetworkManager networkManager;
         private NetworkManagerHUD networkManagerHud;
         private static volatile GameManager instance;
         private bool isGameStarted;
@@ -26,10 +26,10 @@ namespace Assets.Resources.Scripts.Game
         void Start()
         {
             networkManagerGameObject = new GameObject();
-            networkManager = networkManagerGameObject.AddComponent<MyNetworkManager>();
+            networkManager = networkManagerGameObject.AddComponent<NetworkManager>();
             networkManagerHud = networkManagerGameObject.AddComponent<NetworkManagerHUD>();
             networkManagerHud.manager = networkManager;
-            ClientScene.RegisterPrefab(networkManager.PlayerPrefab, NetworkHash128.Parse(Player.TAG));
+            networkManager.playerPrefab = UnityEngine.Resources.Load<GameObject>("Player");
             networkManager.autoCreatePlayer = true;
             networkManagerHud.showGUI = true;
             AddStatusBar();
@@ -52,8 +52,8 @@ namespace Assets.Resources.Scripts.Game
         {
             StatusBar().Lives = 3;
 
-            if (networkManager.localPlayer != null)
-                networkManager.PlayerWasKilled();
+            //if (networkManager.localPlayer != null)
+                //networkManager.PlayerWasKilled();
 
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
