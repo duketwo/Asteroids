@@ -77,6 +77,16 @@ namespace Assets.Resources.Scripts.Game
 
         }
 
+        #region Overrides of NetworkBehaviour
+
+        public override void OnStartLocalPlayer()
+        {
+            Debug.Log("OnStartLocalPlayer");
+            base.OnStartLocalPlayer();
+        }
+
+        #endregion
+
         public Player SetInvuln(int milliseconds = 1500)
         {
             invulnUntil = DateTime.Now.AddMilliseconds(milliseconds);

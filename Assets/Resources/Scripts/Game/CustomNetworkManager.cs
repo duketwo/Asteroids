@@ -12,8 +12,6 @@ namespace Assets.Resources.Scripts.Game
     public class CustomNetworkManager : NetworkManager
     {
         // CONSTANTS
-        public static int POINTS_ASTEROID = 10;
-
 
         // ATTRIBUTES
         private StatusBar _statusBar;
@@ -79,19 +77,18 @@ namespace Assets.Resources.Scripts.Game
         }
         public StatusBar StatusBar()
         {
+            if (!FindObjectsOfType<StatusBar>().Any())
+            {
+                _statusBar = new GameObject().AddComponent<StatusBar>();
+                _statusBar.Init();
+            }
             return _statusBar;
         }
 
         public void StartGame()
         {
-            FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
-            _statusBar = new GameObject().AddComponent<StatusBar>();
-            _statusBar.Init();
-
-            StatusBar().Lives = 3;
-
-            FindObjectsOfType<Player>().Where(k => k.isLocalPlayer).ToList().ForEach(k => k.Respawn()); // ??
-
+            StatusBar().Lives = 10;
+            FindObjectsOfType<Player>().Where(k => k.isLocalPlayer).ToList().ForEach(k => k.Respawn());
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<DynamicLabel>().ToList().ForEach(k => Destroy(k.gameObject));

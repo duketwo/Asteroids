@@ -46,18 +46,22 @@ namespace Assets.Resources.Scripts.Game
                 networkTransform = this.gameObject.AddComponent<NetworkTransform>();
             else
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
-            networkTransform.sendInterval = 1.0f;
+            networkTransform.sendInterval = 0.015f;
         }
 
         private void OnTriggerEnter2D(Collider2D c)
         {
+
+            if (!isServer)
+                return;
+
             if (collidedAlready || c.tag != Asteroid.TAG)
                 return;
 
 
             collidedAlready = true;
 
-            CustomNetworkManager.Instance().StatusBar().Points += CustomNetworkManager.POINTS_ASTEROID;
+            CustomNetworkManager.Instance().StatusBar().Points += Asteroid.POINTS_ASTEROID;
 
             var asteroid = c.gameObject.GetComponent<Asteroid>();
 
@@ -110,7 +114,6 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
-
             if (CustomNetworkManager.Instance().IsGameOver)
                 return;
 

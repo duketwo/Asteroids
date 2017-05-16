@@ -10,6 +10,9 @@ namespace Assets.Resources.Scripts.Game
 {
     class Asteroid : NetworkBehaviour
     {
+
+        public static int POINTS_ASTEROID = 10;
+
         public AsteroidType Type
         {
             get { return (AsteroidType)_typeInt; }
@@ -69,7 +72,7 @@ namespace Assets.Resources.Scripts.Game
                 networkTransform = this.gameObject.AddComponent<NetworkTransform>();
             else
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
-            networkTransform.sendInterval = 1.0f;
+            networkTransform.sendInterval = 0.01f;
             this.tag = TAG;
 
             if (_typeInt != 0)
