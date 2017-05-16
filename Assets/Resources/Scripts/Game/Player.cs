@@ -73,7 +73,7 @@ namespace Assets.Resources.Scripts.Game
                 networkTransform = this.gameObject.AddComponent<NetworkTransform>();
             else
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
-            networkTransform.sendInterval = 0.05f;
+            networkTransform.sendInterval = 0.025f;
 
 
 
@@ -171,10 +171,10 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
-            //if (!isLocalPlayer)
-            //{
-            //    return;
-            //}
+            if (!isLocalPlayer)
+            {
+                return;
+            }
 
             if (GameManager.Instance().IsGameOver)
                 return;

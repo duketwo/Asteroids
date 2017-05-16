@@ -164,11 +164,6 @@ namespace Assets.Resources.Scripts.Game
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
         }
 
-        private void Scale()
-        {
-
-        }
-
     }
 
 

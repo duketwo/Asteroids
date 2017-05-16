@@ -17,34 +17,12 @@ namespace Assets.Resources.Scripts.Game
         public static int POINTS_ASTEROID = 10;
         private int asteroidSpawnDelay = 3000;
         private DateTime nextAsteroidSpawn;
-        private GameObject networkManagerGameObject;
-        public NetworkManager networkManager;
-        private NetworkManagerHUD networkManagerHud;
         private static volatile GameManager instance;
         private bool isGameStarted;
 
         void Start()
         {
-            networkManagerGameObject = new GameObject();
-            networkManager = networkManagerGameObject.AddComponent<NetworkManager>();
-            networkManagerHud = networkManagerGameObject.AddComponent<NetworkManagerHUD>();
-            networkManagerHud.manager = networkManager;
-            networkManager.playerPrefab = UnityEngine.Resources.Load<GameObject>("Player");
-            networkManager.autoCreatePlayer = true;
-            networkManagerHud.showGUI = true;
-            AddStatusBar();
-
-            // 
-
-            StartGame();
-        }
-
-        public StatusBar AddStatusBar()
-        {
-            FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
-            _statusBar = new GameObject().AddComponent<StatusBar>();
-            _statusBar.Init();
-            return _statusBar;
+           
         }
 
         public StatusBar StatusBar()
@@ -52,9 +30,12 @@ namespace Assets.Resources.Scripts.Game
             return _statusBar;
         }
 
-
         public void StartGame()
         {
+            FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
+            _statusBar = new GameObject().AddComponent<StatusBar>();
+            _statusBar.Init();
+
             StatusBar().Lives = 3;
 
             FindObjectsOfType<Player>().ToList().ForEach(k => Destroy(k.gameObject));
@@ -78,8 +59,10 @@ namespace Assets.Resources.Scripts.Game
 
         public static GameManager Instance()
         {
-            if (instance == null)
-                instance = FindObjectOfType<GameManager>();
+            if (instance == null) { 
+                instance = FindObjectOfType<GameManager>() ?? new GameObject().AddComponent<GameManager>();
+                
+            }
             return instance;
         }
 
@@ -99,7 +82,7 @@ namespace Assets.Resources.Scripts.Game
             IsGameOver = true;
         }
 
-        void Update()
+        public void DoUpdate()
         {
             if (!isGameStarted)
                 return;
@@ -132,6 +115,11 @@ namespace Assets.Resources.Scripts.Game
                 IsGameOver = false;
                 return;
             }
+        }
+
+        void Update()
+        {
+           
         }
     }
 }
