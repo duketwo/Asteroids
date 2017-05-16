@@ -48,7 +48,7 @@ namespace Assets.Resources.Scripts.Game
             Debug.Log("Bullet colllided with an asteroid.");
             collidedAlready = true;
 
-            GameManager.Instance().StatusBar().Points += GameManager.POINTS_ASTEROID;
+            CustomNetworkManager.Instance().StatusBar().Points += CustomNetworkManager.POINTS_ASTEROID;
 
             var asteroid = c.gameObject.GetComponent<Asteroid>();
             var direction = asteroid.direction;
@@ -74,7 +74,7 @@ namespace Assets.Resources.Scripts.Game
         void Update()
         {
 
-            if (GameManager.Instance().IsGameOver)
+            if (CustomNetworkManager.Instance().IsGameOver)
                 return;
 
             Utility.ScreenWrap(this.transform);

@@ -152,18 +152,18 @@ namespace Assets.Resources.Scripts.Game
 
             dead = true;
 
-            if (GameManager.Instance().StatusBar().Lives > 0)
-                GameManager.Instance().StatusBar().Lives--;
+            if (CustomNetworkManager.Instance().StatusBar().Lives > 0)
+                CustomNetworkManager.Instance().StatusBar().Lives--;
 
-            Debug.Log("Remaining player lives: " + GameManager.Instance().StatusBar().Lives);
+            Debug.Log("Remaining player lives: " + CustomNetworkManager.Instance().StatusBar().Lives);
 
-            if (GameManager.Instance().StatusBar().Lives == 0)
+            if (CustomNetworkManager.Instance().StatusBar().Lives == 0)
             {
-                GameManager.Instance().SetGameOver();
+                CustomNetworkManager.Instance().SetGameOver();
             }
             else
             {
-                GameManager.Instance().RespawnPlayer();
+                CustomNetworkManager.Instance().RespawnPlayer();
             }
 
         }
@@ -176,7 +176,7 @@ namespace Assets.Resources.Scripts.Game
                 return;
             }
 
-            if (GameManager.Instance().IsGameOver)
+            if (CustomNetworkManager.Instance().IsGameOver)
                 return;
 
             if (invulnUntil > DateTime.Now)

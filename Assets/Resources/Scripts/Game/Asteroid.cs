@@ -158,7 +158,7 @@ namespace Assets.Resources.Scripts.Game
             Utility.ScreenWrap(this.transform);
             this.transform.Rotate(0, 0, 1);
 
-            if (GameManager.Instance().IsGameOver)
+            if (CustomNetworkManager.Instance().IsGameOver)
                 return;
 
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
