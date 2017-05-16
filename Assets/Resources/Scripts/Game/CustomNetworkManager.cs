@@ -22,14 +22,34 @@ namespace Assets.Resources.Scripts.Game
         private static volatile CustomNetworkManager instance;
         private bool isGameStarted;
 
+
         // MEMBERS
         public bool IsGameOver { get; set; }
 
         // METHODS
+
+
+        #region Overrides of NetworkManager
+
         public override void OnServerConnect(NetworkConnection conn)
         {
-            Debug.Log("OnPlayerConnected");
+            Debug.Log("OnPlayerConnected Player count: " + this.numPlayers);
+            base.OnServerConnect(conn);
         }
+        public override void OnClientConnect(NetworkConnection conn)
+        {
+            Debug.Log("OnClientConnect");
+            base.OnClientConnect(conn);
+        }
+
+        public override void OnClientDisconnect(NetworkConnection conn)
+        {
+            Debug.Log("OnClientDisconnect");
+            base.OnClientDisconnect(conn);
+        }
+
+        #endregion
+
 
         void Start()
         {
@@ -38,7 +58,7 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
-           // Debug.Log("Update - CustomNetworkmanager");
+            // Debug.Log("Update - CustomNetworkmanager");
         }
         public StatusBar StatusBar()
         {

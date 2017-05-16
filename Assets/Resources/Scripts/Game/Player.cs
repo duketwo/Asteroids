@@ -25,8 +25,7 @@ namespace Assets.Resources.Scripts.Game
         private DateTime invulnUntil;
         private NetworkIdentity networkIdentity;
         private NetworkTransform networkTransform;
-        private bool dead;
-        private static GameObject bulletPrefab;
+        private bool dead;        
 
         void Start()
         {

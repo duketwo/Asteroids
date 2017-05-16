@@ -51,41 +51,41 @@ namespace Assets.Resources.Scripts.Game
 
         private void OnTriggerEnter2D(Collider2D c)
         {
-//            if (collidedAlready || c.tag != Asteroid.TAG)
-//                return;
-//
-//            Debug.Log("Bullet colllided with an asteroid.");
-//            collidedAlready = true;
-//
-//            CustomNetworkManager.Instance().StatusBar().Points += CustomNetworkManager.POINTS_ASTEROID;
-//
-//            var asteroid = c.gameObject.GetComponent<Asteroid>();
-//            var direction = asteroid.direction;
-//            var direcIndex = asteroid.DIRECTIONS.IndexOf(direction);
-//            var orthoDirectPos = asteroid.DIRECTIONS[(direcIndex - 1 + asteroid.DIRECTIONS.Count - 1) % (asteroid.DIRECTIONS.Count - 1)];
-//            var orthoDirectNeg = asteroid.DIRECTIONS[(direcIndex + 1) % (asteroid.DIRECTIONS.Count - 1)];
-//            switch (asteroid.type)
-//            {
-//                case AsteroidType.AsteroidL:
-//                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectPos).transform.position = c.transform.position;
-//                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectNeg).transform.position = c.transform.position;
-//                    break;
-//                case AsteroidType.AsteroidM:
-//                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectPos).transform.position = c.transform.position;
-//                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectNeg).transform.position = c.transform.position;
-//                    break;
-//            }
-//
-//            Destroy(c.gameObject);
-//            NetworkServer.Destroy(this.gameObject);
-//            Destroy(this.gameObject);
+            if (collidedAlready || c.tag != Asteroid.TAG)
+                return;
+
+            Debug.Log("Bullet colllided with an asteroid.");
+            collidedAlready = true;
+
+            CustomNetworkManager.Instance().StatusBar().Points += CustomNetworkManager.POINTS_ASTEROID;
+
+            var asteroid = c.gameObject.GetComponent<Asteroid>();
+            var direction = asteroid.direction;
+            var direcIndex = asteroid.DIRECTIONS.IndexOf(direction);
+            var orthoDirectPos = asteroid.DIRECTIONS[(direcIndex - 1 + asteroid.DIRECTIONS.Count - 1) % (asteroid.DIRECTIONS.Count - 1)];
+            var orthoDirectNeg = asteroid.DIRECTIONS[(direcIndex + 1) % (asteroid.DIRECTIONS.Count - 1)];
+            switch (asteroid.type)
+            {
+                case AsteroidType.AsteroidL:
+                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectPos).transform.position = c.transform.position;
+                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectNeg).transform.position = c.transform.position;
+                    break;
+                case AsteroidType.AsteroidM:
+                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectPos).transform.position = c.transform.position;
+                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectNeg).transform.position = c.transform.position;
+                    break;
+            }
+
+            Destroy(c.gameObject);
+            Destroy(this.gameObject);
+            NetworkServer.Destroy(this.gameObject);
         }
 
         void Update()
         {
 
-//            if (CustomNetworkManager.Instance().IsGameOver)
-//                return;
+            if (CustomNetworkManager.Instance().IsGameOver)
+                return;
 
             Utility.ScreenWrap(this.transform);
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
