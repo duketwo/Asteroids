@@ -76,17 +76,13 @@ namespace Assets.Resources.Scripts.Game
                     asteroidMOrthoPos.transform.position = c.transform.position;
                     asteroidMScriptCompOrthoPos.direction = orthoDirectPos;
                     
-
                     var asteroidMOrthoNeg = new GameObject();
                     var asteroidMScriptCompOrthoNeg = asteroidMOrthoNeg.AddComponent<Asteroid>();
                     asteroidMScriptCompOrthoNeg.SetAsteroidType(AsteroidType.AsteroidM);
                     asteroidMOrthoNeg.transform.position = c.transform.position;
                     asteroidMScriptCompOrthoNeg.direction = orthoDirectNeg;
-                    
-
-                    //new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectPos).transform.position = c.transform.position;
-                    //new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidM, orthoDirectNeg).transform.position = c.transform.position;
                     break;
+
                 case AsteroidType.AsteroidM:
                     var asteroidSOrthoPos = new GameObject();
                     var asteroidSScriptCompOrthoPos = asteroidSOrthoPos.AddComponent<Asteroid>();
@@ -100,15 +96,11 @@ namespace Assets.Resources.Scripts.Game
                     asteroidSScriptCompOrthoNeg.SetAsteroidType(AsteroidType.AsteroidS);
                     asteroidSOrthoNeg.transform.position = c.transform.position;
                     asteroidSScriptCompOrthoNeg.direction = orthoDirectNeg;
-                    
-
-                    //                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectPos).transform.position = c.transform.position;
-                    //                    new GameObject().AddComponent<Asteroid>().Init(AsteroidType.AsteroidS, orthoDirectNeg).transform.position = c.transform.position;
                     break;
             }
 
             Destroy(c.gameObject);
-            //NetworkServer.Destroy(c.gameObject);
+            NetworkServer.Destroy(c.gameObject);
             Destroy(this.gameObject);
             NetworkServer.Destroy(this.gameObject);
         }
