@@ -137,16 +137,9 @@ namespace Assets.Resources.Scripts.Game
             }
             else
             {
-                CmdRespawnPlayer();
+                GameManager.Instance().networkManager.PlayerWasKilled();
             }
 
-        }
-
-        [Command]
-        public void CmdRespawnPlayer()
-        {
-            MyNetworkManager myNetworkManager = GameManager.Instance().networkManager;
-            myNetworkManager.PlayerWasKilled();
         }
 
 

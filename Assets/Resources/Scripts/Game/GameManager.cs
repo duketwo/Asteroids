@@ -29,10 +29,10 @@ namespace Assets.Resources.Scripts.Game
             networkManager = networkManagerGameObject.AddComponent<MyNetworkManager>();
             networkManagerHud = networkManagerGameObject.AddComponent<NetworkManagerHUD>();
             networkManagerHud.manager = networkManager;
+            ClientScene.RegisterPrefab(networkManager.PlayerPrefab, NetworkHash128.Parse(Player.TAG));
             networkManager.autoCreatePlayer = true;
             networkManagerHud.showGUI = true;
             AddStatusBar();
-
         }
 
         public StatusBar AddStatusBar()

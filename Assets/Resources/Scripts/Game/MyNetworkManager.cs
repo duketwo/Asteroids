@@ -13,14 +13,16 @@ namespace Assets.Resources.Scripts.Game
         public NetworkConnection conn;
         public short playerControllerId;
         public Player localPlayer;
+
         public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
         {
             GameManager.Instance().StartGame();
             this.conn = conn;
             this.playerControllerId = playerControllerId;
-            playerPrefab = new GameObject();
-            localPlayer = playerPrefab.AddComponent<Player>();
-            GameObject player = playerPrefab;
+            playerPrefab = PlayerPrefab;
+            GameObject player = Instantiate(PlayerPrefab);
+            player.SetActive(true);
+            localPlayer = player.GetComponent<Player>();
             NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
         }
 
@@ -31,10 +33,27 @@ namespace Assets.Resources.Scripts.Game
 
             var conn = localPlayer.connectionToClient;
             Destroy(localPlayer.gameObject);
-            var obj = new GameObject();
-            var player = obj.AddComponent<Player>();
-            localPlayer = player;
-            NetworkServer.ReplacePlayerForConnection(conn, obj, playerControllerId);
+
+            GameObject player = Instantiate(PlayerPrefab);
+            player.SetActive(true);
+            localPlayer = player.GetComponent<Player>();
+            NetworkServer.ReplacePlayerForConnection(conn, player, playerControllerId);
+        }
+
+
+        private GameObject _playerPrefab;
+        public GameObject PlayerPrefab
+        {
+            get
+            {
+                if (_playerPrefab == null)
+                {
+                    _playerPrefab = new GameObject();
+                    _playerPrefab.SetActive(false);
+                    _playerPrefab.AddComponent<Player>();
+                }
+                return _playerPrefab;
+            }
         }
     }
 }
