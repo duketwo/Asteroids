@@ -70,32 +70,35 @@ namespace Assets.Resources.Scripts.Game
             switch (asteroid.Type)
             {
                 case AsteroidType.AsteroidL:
-                    var asteroidMOrthoPos = new GameObject();
-                    var asteroidMScriptCompOrthoPos = asteroidMOrthoPos.AddComponent<Asteroid>();
+                    var asteroidMOrthoPos = (GameObject)Instantiate(UnityEngine.Resources.Load<GameObject>("Asteroid"));
+                    var asteroidMScriptCompOrthoPos = asteroidMOrthoPos.GetComponent<Asteroid>();
                     asteroidMScriptCompOrthoPos.SetAsteroidType(AsteroidType.AsteroidM);
                     asteroidMOrthoPos.transform.position = c.transform.position;
                     asteroidMScriptCompOrthoPos.direction = orthoDirectPos;
-                    
-                    var asteroidMOrthoNeg = new GameObject();
-                    var asteroidMScriptCompOrthoNeg = asteroidMOrthoNeg.AddComponent<Asteroid>();
+                    NetworkServer.Spawn(asteroidMOrthoPos);
+
+                    var asteroidMOrthoNeg = (GameObject)Instantiate(UnityEngine.Resources.Load<GameObject>("Asteroid"));
+                    var asteroidMScriptCompOrthoNeg = asteroidMOrthoNeg.GetComponent<Asteroid>();
                     asteroidMScriptCompOrthoNeg.SetAsteroidType(AsteroidType.AsteroidM);
                     asteroidMOrthoNeg.transform.position = c.transform.position;
                     asteroidMScriptCompOrthoNeg.direction = orthoDirectNeg;
+                    NetworkServer.Spawn(asteroidMOrthoNeg);
                     break;
 
                 case AsteroidType.AsteroidM:
-                    var asteroidSOrthoPos = new GameObject();
-                    var asteroidSScriptCompOrthoPos = asteroidSOrthoPos.AddComponent<Asteroid>();
+                    var asteroidSOrthoPos = (GameObject)Instantiate(UnityEngine.Resources.Load<GameObject>("Asteroid"));
+                    var asteroidSScriptCompOrthoPos = asteroidSOrthoPos.GetComponent<Asteroid>();
                     asteroidSScriptCompOrthoPos.SetAsteroidType(AsteroidType.AsteroidS);
                     asteroidSOrthoPos.transform.position = c.transform.position;
                     asteroidSScriptCompOrthoPos.direction = orthoDirectPos;
-                    
+                    NetworkServer.Spawn(asteroidSOrthoPos);
 
-                    var asteroidSOrthoNeg = new GameObject();
-                    var asteroidSScriptCompOrthoNeg = asteroidSOrthoNeg.AddComponent<Asteroid>();
+                    var asteroidSOrthoNeg = (GameObject)Instantiate(UnityEngine.Resources.Load<GameObject>("Asteroid"));
+                    var asteroidSScriptCompOrthoNeg = asteroidSOrthoNeg.GetComponent<Asteroid>();
                     asteroidSScriptCompOrthoNeg.SetAsteroidType(AsteroidType.AsteroidS);
                     asteroidSOrthoNeg.transform.position = c.transform.position;
                     asteroidSScriptCompOrthoNeg.direction = orthoDirectNeg;
+                    NetworkServer.Spawn(asteroidSOrthoNeg);
                     break;
             }
 
