@@ -72,7 +72,7 @@ namespace Assets.Resources.Scripts.Game
                 networkTransform = this.gameObject.AddComponent<NetworkTransform>();
             else
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
-            networkTransform.sendInterval = 0.025f;
+            networkTransform.sendInterval = 0.005f;
 
 
 
