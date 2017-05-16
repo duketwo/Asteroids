@@ -33,6 +33,10 @@ namespace Assets.Resources.Scripts.Game
             networkManager.autoCreatePlayer = true;
             networkManagerHud.showGUI = true;
             AddStatusBar();
+
+            // 
+
+            StartGame();
         }
 
         public StatusBar AddStatusBar()
@@ -52,8 +56,7 @@ namespace Assets.Resources.Scripts.Game
         {
             StatusBar().Lives = 3;
 
-            //if (networkManager.localPlayer != null)
-                //networkManager.PlayerWasKilled();
+            new GameObject().AddComponent<Player>();
 
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));

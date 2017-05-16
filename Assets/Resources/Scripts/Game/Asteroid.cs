@@ -72,12 +72,12 @@ namespace Assets.Resources.Scripts.Game
                 this.direction = direction.Value;
             }
 
-            sr = this.gameObject.AddComponent<SpriteRenderer>();
+            sr = this.gameObject.GetComponent<SpriteRenderer>() != null ? this.gameObject.GetComponent<SpriteRenderer>() : this.gameObject.AddComponent<SpriteRenderer>();
             sr.sortingLayerName = "Foreground";
             sr.sprite = UnityEngine.Resources.Load<Sprite>("Images/square");
-            col = this.gameObject.AddComponent<PolygonCollider2D>();
+            col = this.gameObject.GetComponent<PolygonCollider2D>() != null ? this.gameObject.GetComponent<PolygonCollider2D>() : this.gameObject.AddComponent<PolygonCollider2D>();
             col.isTrigger = true;
-            rb = this.gameObject.AddComponent<Rigidbody2D>();
+            rb = this.gameObject.GetComponent<Rigidbody2D>() != null ? this.gameObject.GetComponent<Rigidbody2D>() : this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
 
             if (type == null) // pick random type if type is null

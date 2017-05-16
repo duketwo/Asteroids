@@ -171,10 +171,10 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
-            if (!isLocalPlayer)
-            {
-                return;
-            }
+            //if (!isLocalPlayer)
+            //{
+            //    return;
+            //}
 
             if (GameManager.Instance().IsGameOver)
                 return;
