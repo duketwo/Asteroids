@@ -15,7 +15,6 @@ namespace Assets.Resources.Scripts.Game
         private double degree;
         private Vector2 velocityVector2;
         private Material mat;
-        private List<Vector3> positions;
         private float SPEED_CONSTANT = 4.5f;
         private float MAX_SPEED = 6.0f;
         private Quaternion initialRotation;
@@ -27,7 +26,7 @@ namespace Assets.Resources.Scripts.Game
         private NetworkIdentity networkIdentity;
         private NetworkTransform networkTransform;
         private bool dead;
-
+        private static GameObject bulletPrefab;
 
         void Start()
         {
@@ -138,10 +137,19 @@ namespace Assets.Resources.Scripts.Game
 
         }
 
-        public void Shoot()
+        [Command]
+        public void CmdShoot()
         {
-            var bullet = new GameObject().AddComponent<Bullet>();
-            bullet.Init(bulletSpawnSpot.transform.position - this.transform.position, bulletSpawnSpot.transform.position, bulletSpawnSpot.transform.rotation);
+            //if (bulletPrefab == null)
+                //bulletPrefab = UnityEngine.Resources.Load<GameObject>("Bullet");
+
+            var obj = (GameObject)Instantiate(UnityEngine.Resources.Load<GameObject>("Bullet"));
+            var bulletScript = obj.GetComponent<Bullet>();
+            bulletScript.direction = bulletSpawnSpot.transform.position - this.transform.position;
+            bulletScript.transform.position = bulletSpawnSpot.transform.position;
+            bulletScript.transform.rotation = bulletSpawnSpot.transform.rotation;
+            //bulletScript.Init(bulletSpawnSpot.transform.position - this.transform.position, bulletSpawnSpot.transform.position, bulletSpawnSpot.transform.rotation);
+            NetworkServer.Spawn(obj);
         }
 
         private void OnTriggerEnter2D(Collider2D c)
@@ -195,7 +203,7 @@ namespace Assets.Resources.Scripts.Game
 
             if (Input.GetKey(KeyCode.Space) && lastShot < DateTime.Now)
             {
-                Shoot();
+                CmdShoot();
                 lastShot = DateTime.Now.AddMilliseconds(100);
             }
 

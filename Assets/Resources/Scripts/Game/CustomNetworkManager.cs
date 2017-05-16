@@ -38,7 +38,7 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
-            Debug.Log("Update - CustomNetworkmanager");
+           // Debug.Log("Update - CustomNetworkmanager");
         }
         public StatusBar StatusBar()
         {
@@ -101,6 +101,24 @@ namespace Assets.Resources.Scripts.Game
 
         public void DoUpdate()
         {
+
+            // BEGIN DEBUG SHORTCUTS ---
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                StatusBar().Lives = 0;
+                SetGameOver();
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                StartGame();
+                IsGameOver = false;
+                return;
+            }
+            // END DEBUG SHORTCUTS ---
+
+
             if (!isGameStarted)
                 return;
 
@@ -119,19 +137,6 @@ namespace Assets.Resources.Scripts.Game
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                StatusBar().Lives = 0;
-                SetGameOver();
-                return;
-            }
-
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                StartGame();
-                IsGameOver = false;
-                return;
-            }
         }
     }
 }

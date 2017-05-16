@@ -1,28 +1,26 @@
 ﻿using System;
-using Assets.Resources.Scripts.Util;
 using UnityEngine;
+using UnityEngine.Networking;
+using Utility = Assets.Resources.Scripts.Util.Utility;
 
 namespace Assets.Resources.Scripts.Game
 {
-    class Bullet : MonoBehaviour
+    class Bullet : NetworkBehaviour
     {
 
         private PolygonCollider2D col;
         private Rigidbody2D rb;
         private SpriteRenderer sr;
-        private Vector3 direction;
+        public Vector3 direction;
         private float SPEED_CONSTANT = 9.0f;
         private DateTime timeDestroy;
         public static string TAG = "BULLET";
         private volatile bool collidedAlready;
+        private NetworkIdentity networkIdentity;
+        private NetworkTransform networkTransform;
 
 
         void Start()
-        {
-
-        }
-
-        public void Init(Vector3 direction, Vector3 pos, Quaternion rotation)
         {
             timeDestroy = DateTime.Now.AddSeconds(2);
             sr = this.gameObject.GetComponent<SpriteRenderer>() != null ? this.gameObject.GetComponent<SpriteRenderer>() : this.gameObject.AddComponent<SpriteRenderer>();
@@ -35,9 +33,18 @@ namespace Assets.Resources.Scripts.Game
             rb.isKinematic = true;
             this.tag = TAG;
             this.name = this.GetType().Name;
-            this.direction = direction;
-            this.transform.position = pos;
-            this.transform.rotation = rotation;
+
+            if (this.GetComponent<NetworkIdentity>() == null)
+                networkIdentity = this.gameObject.AddComponent<NetworkIdentity>();
+            else
+                networkIdentity = this.gameObject.GetComponent<NetworkIdentity>();
+            networkIdentity.localPlayerAuthority = true;
+
+            if (this.GetComponent<NetworkTransform>() == null)
+                networkTransform = this.gameObject.AddComponent<NetworkTransform>();
+            else
+                networkTransform = this.gameObject.GetComponent<NetworkTransform>();
+            networkTransform.sendInterval = 0.05f;
         }
 
         private void OnTriggerEnter2D(Collider2D c)
@@ -68,6 +75,7 @@ namespace Assets.Resources.Scripts.Game
             }
 
             Destroy(c.gameObject);
+            NetworkServer.Destroy(this.gameObject);
             Destroy(this.gameObject);
         }
 
@@ -81,7 +89,10 @@ namespace Assets.Resources.Scripts.Game
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
 
             if (timeDestroy < DateTime.Now)
+            {
                 Destroy(this.gameObject);
+                NetworkServer.Destroy(this.gameObject);
+            }
         }
 
     }
