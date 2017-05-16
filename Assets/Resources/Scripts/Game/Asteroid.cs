@@ -10,10 +10,28 @@ namespace Assets.Resources.Scripts.Game
 {
     class Asteroid : NetworkBehaviour
     {
-        public AsteroidType Type { get; private set; }
+        public AsteroidType Type
+        {
+            get { return (AsteroidType)_typeInt; }
+            set { _typeInt = (int)value; }
+        }
+
+        [SyncVar]
+        private int _typeInt;
+        private int TypeInt
+        {
+            get
+            {
+                return _typeInt;
+            }
+
+            set { _typeInt = value; }
+        }
+
         private PolygonCollider2D col;
         private Rigidbody2D rb;
         private SpriteRenderer sr;
+        [SyncVar]
         public Vector2 direction;
         private float SPEED_CONSTANT = 4.0f;
         public static string TAG = "ASTEROID";
@@ -39,13 +57,13 @@ namespace Assets.Resources.Scripts.Game
             new Vector2(-1,1),
         };
 
-        public void Awake()
+        void Start()
         {
             if (this.GetComponent<NetworkIdentity>() == null)
                 networkIdentity = this.gameObject.AddComponent<NetworkIdentity>();
             else
                 networkIdentity = this.gameObject.GetComponent<NetworkIdentity>();
-            networkIdentity.localPlayerAuthority = true;
+            networkIdentity.localPlayerAuthority = false;
 
             if (this.GetComponent<NetworkTransform>() == null)
                 networkTransform = this.gameObject.AddComponent<NetworkTransform>();
@@ -53,6 +71,9 @@ namespace Assets.Resources.Scripts.Game
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
             networkTransform.sendInterval = 1.0f;
             this.tag = TAG;
+
+            if (_typeInt != 0)
+                SetAsteroidType(Type);
 
         }
 
@@ -95,7 +116,7 @@ namespace Assets.Resources.Scripts.Game
                 : this.gameObject.AddComponent<Rigidbody2D>();
             rb.isKinematic = true;
 
-       
+
         }
 
         public void SetRandomPosition()
@@ -168,9 +189,9 @@ namespace Assets.Resources.Scripts.Game
 
     public enum AsteroidType
     {
-        AsteroidL,
-        AsteroidM,
-        AsteroidS
+        AsteroidL = 1,
+        AsteroidM = 2,
+        AsteroidS = 3
     }
 
 

@@ -22,7 +22,6 @@ namespace Assets.Resources.Scripts.Game
         private static volatile CustomNetworkManager instance;
         private bool isGameStarted;
 
-
         // MEMBERS
         public bool IsGameOver { get; set; }
 
@@ -114,10 +113,12 @@ namespace Assets.Resources.Scripts.Game
 
         public void AddAsteroid(AsteroidType? type)
         {
-            var asteroid = new GameObject().AddComponent<Asteroid>();
+            var obj = (GameObject)Instantiate(UnityEngine.Resources.Load<GameObject>("Asteroid"));
+            var asteroid = obj.GetComponent<Asteroid>();
             asteroid.SetAsteroidType();
             asteroid.SetRandomDirection();
             asteroid.SetRandomPosition();
+            NetworkServer.Spawn(obj);
         }
 
         public void SetGameOver()
