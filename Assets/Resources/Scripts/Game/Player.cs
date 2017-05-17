@@ -23,10 +23,31 @@ namespace Assets.Resources.Scripts.Game
         private float MAX_SPEED = 6.0f;
         private Quaternion initialRotation;
         private GameObject bulletSpawnSpot;
-        private DateTime lastShot;
+
+
+        [SyncVar]
+        private long _lastShotTicks;
+
+        private DateTime lastShot
+        {
+            get { return new DateTime(_lastShotTicks); }
+            set { _lastShotTicks = value.Ticks; }
+
+        }
+
         private PolygonCollider2D col;
         private Rigidbody2D rb;
-        private DateTime invulnUntil;
+
+
+        [SyncVar]
+        private long _invulnUntilTicks;
+
+        private DateTime invulnUntil
+        {
+            get { return new DateTime(_invulnUntilTicks); }
+            set { _invulnUntilTicks = value.Ticks; }
+        }
+
         private NetworkIdentity networkIdentity;
         private NetworkTransform networkTransform;
         [SyncVar]
@@ -37,6 +58,8 @@ namespace Assets.Resources.Scripts.Game
         [SyncVar]
         private int _playerPoints;
         public static Player LocalPlayer { get; private set; }
+
+
 
         void Start()
         {
@@ -72,7 +95,7 @@ namespace Assets.Resources.Scripts.Game
             rb.isKinematic = true;
             this.tag = TAG;
             this.name = this.GetType().Name;
-            SetInvuln();
+            CmdSetInvuln();
             if (this.GetComponent<NetworkIdentity>() == null)
                 networkIdentity = this.gameObject.AddComponent<NetworkIdentity>();
             else
@@ -110,8 +133,6 @@ namespace Assets.Resources.Scripts.Game
             return _statusBar;
         }
 
-
-
         public override void OnStartLocalPlayer()
         {
             Debug.Log("OnStartLocalPlayer");
@@ -136,10 +157,10 @@ namespace Assets.Resources.Scripts.Game
             base.OnStartServer();
         }
 
-        public Player SetInvuln(int milliseconds = 1500)
+        [Command]
+        public void CmdSetInvuln()
         {
-            invulnUntil = DateTime.Now.AddMilliseconds(milliseconds);
-            return this;
+            invulnUntil = DateTime.Now.AddMilliseconds(1500);
         }
 
         public Vector3 Rotate(Vector3 point, Vector3 pivot, Vector3 angles)
@@ -192,8 +213,6 @@ namespace Assets.Resources.Scripts.Game
                 velocityVector2.x -= velocityVector2.x * 0.3f * Time.deltaTime;
                 velocityVector2.y -= velocityVector2.y * 0.3f * Time.deltaTime;
             }
-
-
         }
 
 
@@ -240,7 +259,7 @@ namespace Assets.Resources.Scripts.Game
         [Command]
         public void CmdRespawn()
         {
-            SetInvuln();
+            CmdSetInvuln();
             this.transform.position = Util.Utility.center;
             dead = false;
             this.gameObject.transform.localRotation = initialRotation;
