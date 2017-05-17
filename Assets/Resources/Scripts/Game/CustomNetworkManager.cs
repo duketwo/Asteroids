@@ -14,7 +14,6 @@ namespace Assets.Resources.Scripts.Game
         // CONSTANTS
 
         // ATTRIBUTES
-        private StatusBar _statusBar;
         private int asteroidSpawnDelay = 3000;
         private DateTime nextAsteroidSpawn;
         private static volatile CustomNetworkManager instance;
@@ -75,19 +74,9 @@ namespace Assets.Resources.Scripts.Game
         {
             DoUpdate();
         }
-        public StatusBar StatusBar()
-        {
-            if (!FindObjectsOfType<StatusBar>().Any())
-            {
-                _statusBar = new GameObject().AddComponent<StatusBar>();
-                _statusBar.Init();
-            }
-            return _statusBar;
-        }
 
         public void StartGame()
         {
-            StatusBar().Lives = 10;
             FindObjectsOfType<Player>().Where(k => k.isLocalPlayer).ToList().ForEach(k => k.Respawn());
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
@@ -130,11 +119,10 @@ namespace Assets.Resources.Scripts.Game
 
         public void DoUpdate()
         {
-
             // BEGIN DEBUG SHORTCUTS ---
             if (Input.GetKeyDown(KeyCode.Z))
             {
-                StatusBar().Lives = 0;
+                //StatusBar().Lives = 0;
                 SetGameOver();
                 return;
             }

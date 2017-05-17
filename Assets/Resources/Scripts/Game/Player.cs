@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Resources.Scripts.Game.Menu;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
@@ -11,8 +12,11 @@ namespace Assets.Resources.Scripts.Game
     public class Player : NetworkBehaviour
     {
         public static string TAG = "PLAYER";
+        private static int PLAYER_LIVES = 10;
         private SpriteRenderer sr;
+        [SyncVar]
         private double degree;
+        [SyncVar]
         private Vector2 velocityVector2;
         private Material mat;
         private float SPEED_CONSTANT = 4.5f;
@@ -25,7 +29,14 @@ namespace Assets.Resources.Scripts.Game
         private DateTime invulnUntil;
         private NetworkIdentity networkIdentity;
         private NetworkTransform networkTransform;
+        [SyncVar]
         private bool dead;
+        private StatusBar _statusBar;
+        [SyncVar]
+        private int _playerLives;
+        [SyncVar]
+        private int _playerPoints;
+        public static Player LocalPlayer { get; set; }
 
         void Start()
         {
@@ -43,6 +54,7 @@ namespace Assets.Resources.Scripts.Game
             bulletSpawnSpot.transform.position = this.transform.position + new Vector3(0, 1.0f);
             bulletSpawnSpot.transform.SetParent(this.transform);
             lastShot = DateTime.MinValue;
+            
 
             if (this.gameObject.GetComponent<PolygonCollider2D>() == null)
                 col = this.gameObject.AddComponent<PolygonCollider2D>();
@@ -73,16 +85,53 @@ namespace Assets.Resources.Scripts.Game
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
             networkTransform.sendInterval = 0.005f;
 
+        }
+
+        public int PlayerLives
+        {
+            get { return _playerLives; }
+
+            set
+            {
+                _playerLives = value;
+                StatusBar().Lives = _playerLives;
+            }
+        }
 
 
+
+        public int PlayerPoints
+        {
+            get { return _playerPoints; }
+
+            set
+            {
+                _playerPoints = value;
+                StatusBar().Points = _playerPoints;
+            }
+        }
+
+        public StatusBar StatusBar()
+        {
+            if (_statusBar == null)
+            {
+                FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
+                _statusBar = new GameObject().AddComponent<StatusBar>();
+                _statusBar.Init();
+            }
+            return _statusBar;
         }
 
         #region Overrides of NetworkBehaviour
 
         public override void OnStartLocalPlayer()
         {
+            LocalPlayer = this;
             Debug.Log("OnStartLocalPlayer");
+            StatusBar().Init();
+            PlayerLives = PLAYER_LIVES;
             base.OnStartLocalPlayer();
+            Respawn();   
         }
 
         #endregion
@@ -100,6 +149,11 @@ namespace Assets.Resources.Scripts.Game
 
         public void SetDegree(float val)
         {
+            if (!isLocalPlayer)
+            {
+                return;
+            }
+
             if (val == 0)
                 return;
 
@@ -114,6 +168,11 @@ namespace Assets.Resources.Scripts.Game
 
         public void ModAcceleration(float val)
         {
+            if (!isLocalPlayer)
+            {
+                return;
+            }
+
             if (val > 0)
             {
 
@@ -146,6 +205,7 @@ namespace Assets.Resources.Scripts.Game
 
         }
 
+
         [Command]
         public void CmdShoot()
         {
@@ -159,18 +219,22 @@ namespace Assets.Resources.Scripts.Game
 
         private void OnTriggerEnter2D(Collider2D c)
         {
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             if (c.tag != Asteroid.TAG || dead)
                 return;
             Debug.Log("Player colllided with asteroid.");
 
             dead = true;
 
-            if (CustomNetworkManager.Instance().StatusBar().Lives > 0)
-                CustomNetworkManager.Instance().StatusBar().Lives--;
+            if (PlayerLives > 0)
+                PlayerLives--;
 
-            Debug.Log("Remaining player lives: " + CustomNetworkManager.Instance().StatusBar().Lives);
+            Debug.Log("Remaining player lives: " + PlayerLives);
 
-            if (CustomNetworkManager.Instance().StatusBar().Lives == 0)
+            if (PlayerLives == 0)
             {
                 CustomNetworkManager.Instance().SetGameOver();
             }
@@ -183,6 +247,11 @@ namespace Assets.Resources.Scripts.Game
 
         public void Respawn()
         {
+            if (!isLocalPlayer)
+            {
+                return;
+            }
+
             SetInvuln();
             this.transform.position = Util.Utility.center;
             dead = false;
@@ -218,6 +287,7 @@ namespace Assets.Resources.Scripts.Game
 
             if (Input.GetKey(KeyCode.Space) && lastShot < DateTime.Now)
             {
+
                 CmdShoot();
                 lastShot = DateTime.Now.AddMilliseconds(100);
             }
@@ -235,14 +305,3 @@ namespace Assets.Resources.Scripts.Game
         }
     }
 }
-
-
-//[Command]
-//void CmdRespawnSvr()
-//{
-//var spawn = NetworkManager.singleton.GetStartPosition();
-//var newPlayer = (GameObject)Instantiate(NetworkManager.singleton.playerPrefab, spawn.position, spawn.rotation);
-//NetworkServer.Destroy(this.gameObject);
-//NetworkServer.ReplacePlayerForConnection(this.connectionToClient, newPlayer, this.playerControllerId);
-//
-//}

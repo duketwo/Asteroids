@@ -51,17 +51,10 @@ namespace Assets.Resources.Scripts.Game
 
         private void OnTriggerEnter2D(Collider2D c)
         {
-
-            if (!isServer)
-                return;
-
             if (collidedAlready || c.tag != Asteroid.TAG)
                 return;
 
-
             collidedAlready = true;
-
-            CustomNetworkManager.Instance().StatusBar().Points += Asteroid.POINTS_ASTEROID;
 
             var asteroid = c.gameObject.GetComponent<Asteroid>();
 
