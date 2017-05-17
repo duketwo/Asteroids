@@ -155,7 +155,7 @@ namespace Assets.Resources.Scripts.Game
 
             this.transform.position = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), cornerB.z);
         }
-       
+
         public static AsteroidType GetSemiRandomAsteroidType()
         {
             if (asteroidEntropyDictionary.Values.All(k => k >= 10))
@@ -176,16 +176,22 @@ namespace Assets.Resources.Scripts.Game
             return DIRECTIONS[Random.Range(0, DIRECTIONS.Count)];
         }
 
-        [ServerCallback]
+
         public void Update()
         {
-            Utility.ScreenWrap(this.transform);
-            this.transform.Rotate(0, 0, 1);
-
             if (CustomNetworkManager.Instance().IsGameOver)
                 return;
 
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
+            this.transform.Rotate(0, 0, 1);
+
+            ServerUpdate();
+        }
+
+        [ServerCallback]
+        public void ServerUpdate()
+        {
+            Utility.ScreenWrap(this.transform);
         }
 
     }
