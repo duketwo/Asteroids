@@ -41,24 +41,7 @@ namespace Assets.Resources.Scripts.Game
         private NetworkIdentity networkIdentity;
         private NetworkTransform networkTransform;
 
-        private static Dictionary<AsteroidType, int> asteroidEntropyDictionary = new Dictionary<AsteroidType, int>()
-        {
-            {AsteroidType.AsteroidL, 0},
-            {AsteroidType.AsteroidM, 0},
-            {AsteroidType.AsteroidS, 0}
-        };
 
-        public static List<Vector2> DIRECTIONS = new List<Vector2>()
-        {
-            new Vector2(0,1),
-            new Vector2(1,1),
-            new Vector2(1,0),
-            new Vector2(1,-1),
-            new Vector2(0,-1),
-            new Vector2(-1,-1),
-            new Vector2(-1,0),
-            new Vector2(-1,1),
-        };
 
         void Start()
         {
@@ -156,6 +139,25 @@ namespace Assets.Resources.Scripts.Game
             this.transform.position = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), cornerB.z);
         }
 
+        public void Update()
+        {
+            if (CustomNetworkManager.Instance().IsGameOver)
+                return;
+
+            transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
+            this.transform.Rotate(0, 0, 1);
+
+            ServerUpdate();
+        }
+
+        [ServerCallback]
+        public void ServerUpdate()
+        {
+            Utility.ScreenWrap(this.transform);
+        }
+
+        #region static, enums, types
+
         public static AsteroidType GetSemiRandomAsteroidType()
         {
             if (asteroidEntropyDictionary.Values.All(k => k >= 10))
@@ -177,23 +179,24 @@ namespace Assets.Resources.Scripts.Game
         }
 
 
-        public void Update()
+        private static Dictionary<AsteroidType, int> asteroidEntropyDictionary = new Dictionary<AsteroidType, int>()
         {
-            if (CustomNetworkManager.Instance().IsGameOver)
-                return;
+            {AsteroidType.AsteroidL, 0},
+            {AsteroidType.AsteroidM, 0},
+            {AsteroidType.AsteroidS, 0}
+        };
 
-            transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
-            this.transform.Rotate(0, 0, 1);
-
-            ServerUpdate();
-        }
-
-        [ServerCallback]
-        public void ServerUpdate()
+        public static List<Vector2> DIRECTIONS = new List<Vector2>()
         {
-            Utility.ScreenWrap(this.transform);
-        }
-
+            new Vector2(0,1),
+            new Vector2(1,1),
+            new Vector2(1,0),
+            new Vector2(1,-1),
+            new Vector2(0,-1),
+            new Vector2(-1,-1),
+            new Vector2(-1,0),
+            new Vector2(-1,1),
+        };
     }
 
 
@@ -204,5 +207,5 @@ namespace Assets.Resources.Scripts.Game
         AsteroidS = 3
     }
 
-
+    #endregion
 }
