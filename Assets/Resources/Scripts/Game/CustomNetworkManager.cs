@@ -77,7 +77,7 @@ namespace Assets.Resources.Scripts.Game
 
         public void StartGame()
         {
-            FindObjectsOfType<Player>().Where(k => k.isLocalPlayer).ToList().ForEach(k => k.Respawn());
+            FindObjectsOfType<Player>().Where(k => k.isLocalPlayer).ToList().ForEach(k => k.CmdRespawn());
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<DynamicLabel>().ToList().ForEach(k => Destroy(k.gameObject));
