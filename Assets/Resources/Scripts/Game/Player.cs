@@ -73,7 +73,6 @@ namespace Assets.Resources.Scripts.Game
             if (!isLocalPlayer)
                 return;
 
-            Debug.Log("PlayerlivesHook value: " + value + " isLocalPlayer:" + isLocalPlayer);
             _playerLives = value;
             StatusBar().Lives = value;
         }
@@ -83,7 +82,6 @@ namespace Assets.Resources.Scripts.Game
             if (!isLocalPlayer)
                 return;
 
-            Debug.Log("PlayerlivesHook value: " + value + " isLocalPlayer:" + isLocalPlayer);
             _playerPoints = value;
             StatusBar().Points = value;
         }
@@ -253,7 +251,7 @@ namespace Assets.Resources.Scripts.Game
             if (c.tag != Asteroid.TAG || invulnUntil > DateTime.Now)
                 return;
 
-            Debug.Log("Player colllided with asteroid.");
+            Debug.Log("Player colllided with an asteroid.");
 
             if (_playerLives > 0)
             {

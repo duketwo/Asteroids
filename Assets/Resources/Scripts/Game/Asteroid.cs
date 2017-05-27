@@ -55,7 +55,7 @@ namespace Assets.Resources.Scripts.Game
                 networkTransform = this.gameObject.AddComponent<NetworkTransform>();
             else
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
-            networkTransform.sendInterval = 0.01f;
+            networkTransform.sendInterval = 0.005f;
             this.tag = TAG;
 
             if (_typeInt != 0)
@@ -139,19 +139,20 @@ namespace Assets.Resources.Scripts.Game
             this.transform.position = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), cornerB.z);
         }
 
+        [ClientCallback]
         public void Update()
         {
-            
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
             this.transform.Rotate(0, 0, 1);
-
+            Utility.ScreenWrap(this.transform);
             ServerUpdate();
         }
 
         [ServerCallback]
         public void ServerUpdate()
         {
-            Utility.ScreenWrap(this.transform);
+            
+            
         }
 
         #region static, enums, types
