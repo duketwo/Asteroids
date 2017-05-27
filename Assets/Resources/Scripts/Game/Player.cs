@@ -183,6 +183,7 @@ namespace Assets.Resources.Scripts.Game
         public void CmdInitPlayer()
         {
             _playerLives = PLAYER_LIVES;
+            _playerPoints = 0;
             TargetRespawn(connectionToClient);
             IsGameOver = false;
         }

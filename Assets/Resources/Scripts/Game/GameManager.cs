@@ -11,7 +11,8 @@ namespace Assets.Resources.Scripts.Game
     public class GameManager : NetworkBehaviour
     {
 
-        private int asteroidSpawnDelay = 3000;
+        private int INITIAL_ASTEROID_SPAWNDELAY = 3000;
+        private int asteroidSpawnDelay;
         private DateTime nextAsteroidSpawn;
         private static volatile GameManager instance;
         private bool isGameStarted;
@@ -29,20 +30,19 @@ namespace Assets.Resources.Scripts.Game
                 return;
             }
 
-            if (!isGameStarted)
-                return;
-
             if (nextAsteroidSpawn < DateTime.Now)
             {
                 nextAsteroidSpawn = DateTime.Now.AddMilliseconds(asteroidSpawnDelay);
                 if (asteroidSpawnDelay > 150)
                     asteroidSpawnDelay -= 50;
-                //AddAsteroid(null);
+                AddAsteroid(null);
             }
         }
 
         public void StartGame()
         {
+            asteroidSpawnDelay = INITIAL_ASTEROID_SPAWNDELAY;
+            nextAsteroidSpawn = DateTime.MinValue;
             FindObjectsOfType<Player>().ToList().ForEach(k => k.CmdInitPlayer());
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
