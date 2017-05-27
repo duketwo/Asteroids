@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Resources.Scripts.Game.Menu;
+using Assets.Resources.Scripts.Util;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
@@ -12,7 +13,9 @@ namespace Assets.Resources.Scripts.Game
     public class Player : NetworkBehaviour
     {
         public static string TAG = "PLAYER";
-        private static int PLAYER_LIVES = 10;
+        private static int PLAYER_LIVES = 1;
+        private static int INVULN_TIME = 1500;
+
         private SpriteRenderer sr;
         [SyncVar]
         private double degree;
@@ -50,15 +53,27 @@ namespace Assets.Resources.Scripts.Game
 
         private NetworkIdentity networkIdentity;
         private NetworkTransform networkTransform;
-        [SyncVar]
-        private bool dead;
         private StatusBar _statusBar;
-        [SyncVar]
+        [SyncVar(hook = "OnPlayerLivesHook")]
         private int _playerLives;
         [SyncVar]
         private int _playerPoints;
         public static Player LocalPlayer { get; private set; }
 
+        [SyncVar(hook = "OnIsGameOverHook")]
+        public bool IsGameOver;
+
+        void OnIsGameOverHook(bool value)
+        {
+            IsGameOver = value;
+        }
+
+        void OnPlayerLivesHook(int value)
+        {
+            _playerLives = value;
+            StatusBar().Points = _playerPoints;
+            //TargetSetPlayerLives(connectionToClient, _playerLives);
+        }
 
 
         void Start()
@@ -95,7 +110,9 @@ namespace Assets.Resources.Scripts.Game
             rb.isKinematic = true;
             this.tag = TAG;
             this.name = this.GetType().Name;
-            CmdSetInvuln();
+
+            invulnUntil = DateTime.Now.AddMilliseconds(INVULN_TIME);
+
             if (this.GetComponent<NetworkIdentity>() == null)
                 networkIdentity = this.gameObject.AddComponent<NetworkIdentity>();
             else
@@ -108,18 +125,7 @@ namespace Assets.Resources.Scripts.Game
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
             networkTransform.sendInterval = 0.005f;
 
-        }
-
-        [TargetRpc]
-        public void TargetSetPlayerLives(NetworkConnection nc)
-        {
-            StatusBar().Lives = _playerLives;
-        }
-
-        [TargetRpc]
-        public void TargetSetPlayerPoints(NetworkConnection nc)
-        {
-            StatusBar().Points = _playerPoints;
+            StatusBar().Init();
         }
 
         public StatusBar StatusBar()
@@ -136,14 +142,13 @@ namespace Assets.Resources.Scripts.Game
         public override void OnStartLocalPlayer()
         {
             Debug.Log("OnStartLocalPlayer");
+            LocalPlayer = this;
             base.OnStartLocalPlayer();
         }
 
         public override void OnStartClient() // CALLED ON EVERY CLIENT INIT
         {
             Debug.Log("OnStartClient");
-            LocalPlayer = this;
-            StatusBar().Init();
             base.OnStartClient();
         }
 
@@ -151,21 +156,17 @@ namespace Assets.Resources.Scripts.Game
         {
             Debug.Log("OnStartServer");
             Debug.Log("connectionToClientId: " + connectionToClient.connectionId);
-            _playerLives = PLAYER_LIVES;
-            TargetSetPlayerLives(connectionToClient);
-            CmdRespawn();
+            CmdInitPlayer();
             base.OnStartServer();
         }
 
         [Command]
-        public void CmdSetInvuln()
+        public void CmdInitPlayer()
         {
-            invulnUntil = DateTime.Now.AddMilliseconds(1500);
-        }
-
-        public Vector3 Rotate(Vector3 point, Vector3 pivot, Vector3 angles)
-        {
-            return Quaternion.Euler(-angles) * (point - pivot) + pivot;
+            _playerLives = PLAYER_LIVES;
+            //TargetSetPlayerLives(connectionToClient, _playerLives);
+            TargetRespawn(connectionToClient);
+            IsGameOver = false;
         }
 
         public void SetDegree(float val)
@@ -230,43 +231,57 @@ namespace Assets.Resources.Scripts.Game
         [ServerCallback]
         private void OnTriggerEnter2D(Collider2D c)
         {
-            if (c.tag != Asteroid.TAG || dead)
+            if (c.tag != Asteroid.TAG || invulnUntil > DateTime.Now)
                 return;
-            Debug.Log("Player colllided with asteroid.");
 
-            dead = true;
+            Debug.Log("Player colllided with asteroid.");
 
             if (_playerLives > 0)
             {
                 _playerLives--;
-                TargetSetPlayerLives(connectionToClient);
+                //TargetSetPlayerLives(connectionToClient, _playerLives);
             }
 
             Debug.Log("Remaining player lives: " + _playerLives);
 
             if (_playerLives == 0)
             {
-                CustomNetworkManager.Instance().SetGameOver();
+                TargetShowGameOver(connectionToClient);
             }
             else
             {
-                CmdRespawn();
+                TargetRespawn(connectionToClient);
             }
 
         }
 
-
-        [Command]
-        public void CmdRespawn()
+        [TargetRpc]
+        public void TargetRespawn(NetworkConnection nc)
         {
             CmdSetInvuln();
             this.transform.position = Util.Utility.center;
-            dead = false;
-            this.gameObject.transform.localRotation = initialRotation;
+            this.transform.localRotation = initialRotation;
             this.velocityVector2 = Vector2.zero;
             this.degree = 0;
+            this.IsGameOver = false;
+
         }
 
+        [Command]
+        public void CmdSetInvuln()
+        {
+            invulnUntil = DateTime.Now.AddMilliseconds(INVULN_TIME);
+            this.velocityVector2 = Vector2.zero;
+            this.degree = 0;
+            IsGameOver = false;
+        }
+
+        [Command]
+        public void CmdRestartGame()
+        {
+            var obj = FindObjectOfType<GameManager>();
+            obj.StartGame();
+        }
 
         void Update()
         {
@@ -275,7 +290,14 @@ namespace Assets.Resources.Scripts.Game
                 return;
             }
 
-            if (CustomNetworkManager.Instance().IsGameOver)
+            if (LocalPlayer.IsGameOver && Input.GetKeyDown(KeyCode.R))
+            {
+                CmdRestartGame();
+                IsGameOver = false;
+                return;
+            };
+
+            if (LocalPlayer.IsGameOver)
                 return;
 
             if (invulnUntil > DateTime.Now)
@@ -306,9 +328,22 @@ namespace Assets.Resources.Scripts.Game
             transform.position += new Vector3(velocityVector2.x, velocityVector2.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
         }
 
-        void FixedUpdate()
+        [TargetRpc]
+        public void TargetShowGameOver(NetworkConnection nc)
         {
+            if (IsGameOver)
+                return;
 
+            DynamicLabel.CreateLabel(string.Format("{0}", "        GAME OVER :( \n PRESS R TO CONTINUE"), DymicLabelPosition.HORIZONTAL_AND_VERTICAL_CENTERED,
+                5.0f, 30, true);
+            CmdSetGameOver(true);
         }
+
+        [Command]
+        public void CmdSetGameOver(bool value)
+        {
+            IsGameOver = value;
+        }
+
     }
 }

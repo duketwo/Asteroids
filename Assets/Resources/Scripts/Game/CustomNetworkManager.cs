@@ -11,25 +11,13 @@ namespace Assets.Resources.Scripts.Game
 {
     public class CustomNetworkManager : NetworkManager
     {
-        // CONSTANTS
 
-        // ATTRIBUTES
-        private int asteroidSpawnDelay = 3000;
-        private DateTime nextAsteroidSpawn;
-        private static volatile CustomNetworkManager instance;
-        private bool isGameStarted;
-
-        // MEMBERS
-        public bool IsGameOver { get; set; }
-
-        // METHODS
-
+        public static int PlayerCount { get; set; }
 
         #region Overrides of NetworkManager
 
         public override void OnServerConnect(NetworkConnection conn)
         {
-            StartGame();
             Debug.Log("OnPlayerConnected Player count: " + this.numPlayers);
             base.OnServerConnect(conn);
         }
@@ -48,18 +36,21 @@ namespace Assets.Resources.Scripts.Game
 
         public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId, NetworkReader extraMessageReader)
         {
+            PlayerCount++;
             Debug.Log("OnServerAddPlayer");
             base.OnServerAddPlayer(conn, playerControllerId, extraMessageReader);
         }
 
         public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
         {
+            PlayerCount++;
             Debug.Log("OnServerAddPlayer");
             base.OnServerAddPlayer(conn, playerControllerId);
         }
 
         public override void OnServerRemovePlayer(NetworkConnection conn, PlayerController player)
         {
+            PlayerCount--;
             Debug.Log("OnServerRemovePlayer");
             base.OnServerRemovePlayer(conn, player);
         }
@@ -68,92 +59,6 @@ namespace Assets.Resources.Scripts.Game
         void Start()
         {
             Debug.Log("Start - CustomNetworkmanager");
-        }
-
-        void Update()
-        {
-            DoUpdate();
-        }
-
-        public void StartGame()
-        {
-            FindObjectsOfType<Player>().Where(k => k.isLocalPlayer).ToList().ForEach(k => k.CmdRespawn());
-            FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
-            FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
-            FindObjectsOfType<DynamicLabel>().ToList().ForEach(k => Destroy(k.gameObject));
-            for (int i = 0; i < 10; i++)
-                AddAsteroid(null);
-            isGameStarted = true;
-        }
-
-
-        public static CustomNetworkManager Instance()
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<CustomNetworkManager>();
-
-            }
-            return instance;
-        }
-
-        public void AddAsteroid(AsteroidType? type)
-        {
-            var obj = (GameObject)Instantiate(UnityEngine.Resources.Load<GameObject>("Asteroid"));
-            var asteroid = obj.GetComponent<Asteroid>();
-            asteroid.SetAsteroidType();
-            asteroid.SetRandomDirection();
-            asteroid.SetRandomPosition();
-            NetworkServer.Spawn(obj);
-        }
-
-        public void SetGameOver()
-        {
-            if (IsGameOver)
-                return;
-
-            DynamicLabel.CreateLabel(string.Format("{0}", "        GAME OVER :( \n PRESS R TO CONTINUE"), DymicLabelPosition.HORIZONTAL_AND_VERTICAL_CENTERED,
-                5.0f, 30, true);
-            IsGameOver = true;
-        }
-
-        public void DoUpdate()
-        {
-            // BEGIN DEBUG SHORTCUTS ---
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                //StatusBar().Lives = 0;
-                SetGameOver();
-                return;
-            }
-
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                StartGame();
-                IsGameOver = false;
-                return;
-            }
-            // END DEBUG SHORTCUTS ---
-
-
-            if (!isGameStarted)
-                return;
-
-            if (!IsGameOver && nextAsteroidSpawn < DateTime.Now)
-            {
-                nextAsteroidSpawn = DateTime.Now.AddMilliseconds(asteroidSpawnDelay);
-                if (asteroidSpawnDelay > 150)
-                    asteroidSpawnDelay -= 50;
-                //AddAsteroid(null);
-            }
-
-            if (IsGameOver && Input.GetKeyDown(KeyCode.R))
-            {
-                IsGameOver = false;
-                StartGame();
-                return;
-            }
-
         }
     }
 }

@@ -141,7 +141,7 @@ namespace Assets.Resources.Scripts.Game
 
         public void Update()
         {
-            if (CustomNetworkManager.Instance().IsGameOver)
+            if (Player.LocalPlayer.IsGameOver)
                 return;
 
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
