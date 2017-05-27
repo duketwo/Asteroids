@@ -108,16 +108,8 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
-
-            //            Debug.Log("IsNetworkServer.active: " + NetworkServer.active);
-            //            Debug.Log("NetworkClient.active: " + NetworkClient.active);
-
-            if (Player.LocalPlayer.IsGameOver)
-                return;
             transform.position += new Vector3(direction.x, direction.y, 0) * SPEED_CONSTANT * Time.smoothDeltaTime;
-
             ServerUpdate();
-
         }
 
         [ServerCallback]

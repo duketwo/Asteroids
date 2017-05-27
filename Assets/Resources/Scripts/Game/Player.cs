@@ -13,7 +13,7 @@ namespace Assets.Resources.Scripts.Game
     public class Player : NetworkBehaviour
     {
         public static string TAG = "PLAYER";
-        private static int PLAYER_LIVES = 1;
+        private static int PLAYER_LIVES = 3;
         private static int INVULN_TIME = 1500;
 
         private SpriteRenderer sr;
@@ -42,7 +42,7 @@ namespace Assets.Resources.Scripts.Game
         private Rigidbody2D rb;
 
 
-        [SyncVar]
+        [SyncVar(hook = "OnInvulnUntilTicksHook")]
         private long _invulnUntilTicks;
 
         private DateTime invulnUntil
@@ -71,8 +71,12 @@ namespace Assets.Resources.Scripts.Game
         void OnPlayerLivesHook(int value)
         {
             _playerLives = value;
-            StatusBar().Points = _playerPoints;
-            //TargetSetPlayerLives(connectionToClient, _playerLives);
+            StatusBar().Lives = value;
+        }
+
+        void OnInvulnUntilTicksHook(long value)
+        {
+            _invulnUntilTicks = value;
         }
 
 
@@ -124,15 +128,13 @@ namespace Assets.Resources.Scripts.Game
             else
                 networkTransform = this.gameObject.GetComponent<NetworkTransform>();
             networkTransform.sendInterval = 0.005f;
-
-            StatusBar().Init();
         }
 
         public StatusBar StatusBar()
         {
             if (_statusBar == null)
             {
-                FindObjectsOfType<StatusBar>().ToList().ForEach(k => DestroyImmediate(k.gameObject));
+                FindObjectsOfType<StatusBar>().ToList().ForEach(k => Destroy(k.gameObject));
                 _statusBar = new GameObject().AddComponent<StatusBar>();
                 _statusBar.Init();
             }
@@ -143,20 +145,20 @@ namespace Assets.Resources.Scripts.Game
         {
             Debug.Log("OnStartLocalPlayer");
             LocalPlayer = this;
+            CmdInitPlayer();
             base.OnStartLocalPlayer();
         }
 
-        public override void OnStartClient() // CALLED ON EVERY CLIENT INIT
+        public override void OnStartClient()
         {
             Debug.Log("OnStartClient");
             base.OnStartClient();
         }
 
-        public override void OnStartServer() // ONLY CALLED WHILE SERVER INIT
+        public override void OnStartServer()
         {
             Debug.Log("OnStartServer");
             Debug.Log("connectionToClientId: " + connectionToClient.connectionId);
-            CmdInitPlayer();
             base.OnStartServer();
         }
 
@@ -164,14 +166,12 @@ namespace Assets.Resources.Scripts.Game
         public void CmdInitPlayer()
         {
             _playerLives = PLAYER_LIVES;
-            //TargetSetPlayerLives(connectionToClient, _playerLives);
             TargetRespawn(connectionToClient);
             IsGameOver = false;
         }
 
         public void SetDegree(float val)
         {
-
             if (val == 0)
                 return;
 
@@ -239,7 +239,6 @@ namespace Assets.Resources.Scripts.Game
             if (_playerLives > 0)
             {
                 _playerLives--;
-                //TargetSetPlayerLives(connectionToClient, _playerLives);
             }
 
             Debug.Log("Remaining player lives: " + _playerLives);
@@ -259,12 +258,16 @@ namespace Assets.Resources.Scripts.Game
         public void TargetRespawn(NetworkConnection nc)
         {
             CmdSetInvuln();
+            Respawn();
+        }
+
+        private void Respawn()
+        {
             this.transform.position = Util.Utility.center;
             this.transform.localRotation = initialRotation;
             this.velocityVector2 = Vector2.zero;
             this.degree = 0;
             this.IsGameOver = false;
-
         }
 
         [Command]
@@ -280,6 +283,7 @@ namespace Assets.Resources.Scripts.Game
         public void CmdRestartGame()
         {
             var obj = FindObjectOfType<GameManager>();
+            _playerLives = PLAYER_LIVES;
             obj.StartGame();
         }
 
@@ -290,9 +294,10 @@ namespace Assets.Resources.Scripts.Game
                 return;
             }
 
-            if (LocalPlayer.IsGameOver && Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(KeyCode.R))
             {
                 CmdRestartGame();
+                Respawn();
                 IsGameOver = false;
                 return;
             };
@@ -336,13 +341,7 @@ namespace Assets.Resources.Scripts.Game
 
             DynamicLabel.CreateLabel(string.Format("{0}", "        GAME OVER :( \n PRESS R TO CONTINUE"), DymicLabelPosition.HORIZONTAL_AND_VERTICAL_CENTERED,
                 5.0f, 30, true);
-            CmdSetGameOver(true);
-        }
-
-        [Command]
-        public void CmdSetGameOver(bool value)
-        {
-            IsGameOver = value;
+            IsGameOver = true;
         }
 
     }

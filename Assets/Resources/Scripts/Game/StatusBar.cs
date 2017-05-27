@@ -84,6 +84,9 @@ namespace Assets.Resources.Scripts.Game.Menu
 
         public void Init()
         {
+            if (this._initialized)
+                return;
+
             Rect screenRect = AspectUtility.screenRect;
             _guiStyle = new GUIStyle();
             _guiStyle.fontSize = (int)(screenRect.width / FONT_SIZE);

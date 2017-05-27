@@ -23,7 +23,6 @@ namespace Assets.Resources.Scripts.Game
 
         void Update()
         {
-            //&& CustomNetworkManager.PlayerCount > 1
             if (!isGameStarted)
             {
                 StartGame();
@@ -40,13 +39,11 @@ namespace Assets.Resources.Scripts.Game
                     asteroidSpawnDelay -= 50;
                 //AddAsteroid(null);
             }
-
-        
         }
 
         public void StartGame()
         {
-            FindObjectsOfType<Player>().Where(k => k.isLocalPlayer).ToList().ForEach(k => k.CmdInitPlayer());
+            FindObjectsOfType<Player>().ToList().ForEach(k => k.CmdInitPlayer());
             FindObjectsOfType<Bullet>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<Asteroid>().ToList().ForEach(k => Destroy(k.gameObject));
             FindObjectsOfType<DynamicLabel>().ToList().ForEach(k => Destroy(k.gameObject));
