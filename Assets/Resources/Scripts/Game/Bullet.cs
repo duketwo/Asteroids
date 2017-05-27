@@ -20,6 +20,7 @@ namespace Assets.Resources.Scripts.Game
         private bool collidedAlready;
         private NetworkIdentity networkIdentity;
         private NetworkTransform networkTransform;
+        public Player playerRef { get; set; }
 
 
         void Start()
@@ -99,6 +100,9 @@ namespace Assets.Resources.Scripts.Game
                     NetworkServer.Spawn(asteroidSOrthoNeg);
                     break;
             }
+
+            if (this.playerRef != null)
+                playerRef._playerPoints += Asteroid.POINTS_ASTEROID;
 
             Destroy(c.gameObject);
             NetworkServer.Destroy(c.gameObject);

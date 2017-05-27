@@ -56,8 +56,8 @@ namespace Assets.Resources.Scripts.Game
         private StatusBar _statusBar;
         [SyncVar(hook = "OnPlayerLivesHook")]
         private int _playerLives;
-        [SyncVar]
-        private int _playerPoints;
+        [SyncVar(hook = "OnPlayerPointsHook")]
+        public int _playerPoints;
         public static Player LocalPlayer { get; private set; }
 
         [SyncVar(hook = "OnIsGameOverHook")]
@@ -70,12 +70,29 @@ namespace Assets.Resources.Scripts.Game
 
         void OnPlayerLivesHook(int value)
         {
+            if (!isLocalPlayer)
+                return;
+
+            Debug.Log("PlayerlivesHook value: " + value + " isLocalPlayer:" + isLocalPlayer);
             _playerLives = value;
             StatusBar().Lives = value;
         }
 
+        void OnPlayerPointsHook(int value)
+        {
+            if (!isLocalPlayer)
+                return;
+
+            Debug.Log("PlayerlivesHook value: " + value + " isLocalPlayer:" + isLocalPlayer);
+            _playerPoints = value;
+            StatusBar().Points = value;
+        }
+
         void OnInvulnUntilTicksHook(long value)
         {
+            if (!isLocalPlayer)
+                return;
+
             _invulnUntilTicks = value;
         }
 
@@ -225,6 +242,7 @@ namespace Assets.Resources.Scripts.Game
             bulletScript.direction = bulletSpawnSpot.transform.position - this.transform.position;
             bulletScript.transform.position = bulletSpawnSpot.transform.position;
             bulletScript.transform.rotation = bulletSpawnSpot.transform.rotation;
+            bulletScript.playerRef = this;
             NetworkServer.Spawn(obj);
         }
 
